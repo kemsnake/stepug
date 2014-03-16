@@ -1,0 +1,106 @@
+img, media {
+  max-width: 100%;
+}
+
+/* No files to import found in partials/components/**\/* */
+
+/* popular products block */
+.view-popular-products .view-content .views-row {
+    width: 30%;
+    margin-right: 3%;
+    border: 1px inset gray;
+    display: block;
+    float:left;
+    border-radius: 25px;
+    padding:10px;
+    background: none;
+}
+
+.view-popular-products .view-content .views-row:hover {
+    background: lightgray;
+}
+.view-popular-products .view-content .views-row .views-field-title {
+    height:30px;
+    text-align: center;
+}
+
+.view-popular-products .view-content .views-row .views-field-field-field-product-photo {
+    height:225px;
+    text-align: center;
+}
+
+.view-popular-products .view-content .views-row .views-field-commerce-price {
+    float: right;
+    clear:both;
+}
+.view-popular-products .view-content .views-row .views-field-add-to-cart-form {
+    float: right;
+    clear:both;
+}
+
+
+.view-popular-products .view-content .views-row .views-field-commerce-price .field-content {
+    float: left;
+}
+.view-popular-products .view-content .views-row .views-label-commerce-price {
+    float: left;
+}
+
+
+/* end popular products block */
+
+/* site header */
+@font-face {
+    font-family: Xiomara; /* Гарнитура шрифта */
+    src: url(../fonts/Xiomara.eot); /* Для IE5-8 */
+    src: url(../fonts/Xiomara.svg); /* iOS */
+    src: local(Xiomara), url(../fonts/Xiomara.ttf); /* Для остальных браузеров */
+}
+
+.site-logo {
+    display: block;
+    float: left;
+    margin-right: 15px;
+
+}
+
+.site-name a{
+    text-decoration: none;
+}
+.site-name span{
+    font-family: Xiomara;
+    color: red;
+
+}
+
+.l-branding {
+    width: 38.20339%!important;
+}
+
+.l-region--header {
+    width: 60.10169%!important;
+}
+.ajax-register-links {
+    list-style: none;
+}
+.ajax-register-links li {
+    float:left;
+    padding-right:25px;
+}
+#block-commerce-ajax-basket-link-commerce-ajax-basket-link {
+    float:right;
+}
+#block-ajax-register-ajax-register-block {
+    float:right;
+}
+.ajax-register-links-wrapper{
+    overflow: hidden;
+    float:right;
+    clear:both;
+    margin-bottom: 10px;
+}
+#modal-content form .form-item,
+#modal-content form .form-actions {
+    float: left;
+}
+/* end site header */

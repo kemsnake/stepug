@@ -1,0 +1,118 @@
+<?php
+/**
+ * @file
+ * Creates block containing a Drupal Commerce basket/cart link that
+ * updates on the fly as items are added.
+ */
+
+/**
+ * Implements hook_block_view().
+ */
+function commerce_ajax_basket_link_block_view($delta = '') {
+
+  $block = array();
+
+  switch ($delta) {
+    case 'commerce_ajax_basket_link':
+      $block['subject'] = '';
+      $block['content'] = commerce_ajax_basket_link_static_output();
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function commerce_ajax_basket_link_block_info() {
+
+  $blocks['commerce_ajax_basket_link'] = array(
+    'info' => t('Ajax Basket Link'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Returns renderable array of basket link static content.
+ */
+function commerce_ajax_basket_link_static_output() {
+
+  $order_data = commerce_ajax_basket_link_order_data();
+  $qty = format_plural($order_data['qty'], '1 item', '@count items');
+  $price = commerce_currency_format($order_data['total']['amount'], $order_data['total']['currency_code']);
+
+  if ($qty > 0){
+    $output = array(
+      '#type' => 'markup',
+      '#markup' => '<p>' . l(t('View cart'), 'cart') . ' (' . $qty . ' ' . $price . ')</p>',
+    );
+  }
+  else {
+    $output = array(
+      '#type' => 'markup',
+      '#markup' => '<p>' . t('Cart is empty') . '</p>',
+    );
+  }
+
+  return $output;
+}
+
+/**
+ * Get's current basket / cart order data.
+ */
+function commerce_ajax_basket_link_order_data() {
+
+  $order_data = array();
+
+  // Get up to date order data.
+  $order = commerce_cart_order_load($GLOBALS['user']->uid);
+  $order_data['line_items'] = '';
+  $order_data['qty'] = 0;
+  $order_data['total'] = 0;
+  $order_data['currency'] = '';
+
+  if ($order) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $order_data['line_items'] = $wrapper->commerce_line_items;
+    $order_data['qty'] = commerce_line_items_quantity($order_data['line_items'], commerce_product_line_item_types());
+    $order_data['total'] = commerce_line_items_total($order_data['line_items']);
+    $order_data['currency'] = commerce_currency_load($order_data['total']['currency_code']);
+  }
+
+  $order_data['qty'] = (isset($order_data['qty']) && $order_data['qty'] != NULL) ? $order_data['qty'] : 0;
+
+  return $order_data;
+}
+
+/**
+ * Hook form alter on add to cart form.
+ */
+function commerce_ajax_basket_link_form_alter(&$form, &$form_state, $form_id) {
+
+  if (strpos($form_id, 'commerce_cart_add_to_cart_form') !== FALSE)  {
+    $form['submit']["#ajax"] = array(
+      'callback' => 'commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback',
+      'effect' => 'fade',
+    );
+    $form['submit']['#id'] = 'edit-submit--' . $form['product_id']['#value'];
+  }
+}
+
+/**
+ * Ajax callback for updating basket link when item is added.
+ */
+function commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback($form, $form_state) {
+
+  // Get edit-submit ID
+  $submit_id = $form['submit']['#id'];
+
+  // Basket items into top nav.
+  $output = commerce_ajax_basket_link_static_output();
+  $output['#markup'] = '<div class="content clearfix">' . $output['#markup'] . '</div>';
+  $commands[] = ajax_command_replace('#' . $submit_id, '<p>' . l(t('Item added to basket'), 'cart') . '</p>');
+  $commands[] = ajax_command_replace('#block-commerce-ajax-basket-link-commerce-ajax-basket-link .block__content', $output['#markup']);
+  return array('#type' => 'ajax', '#commands' => $commands);
+}

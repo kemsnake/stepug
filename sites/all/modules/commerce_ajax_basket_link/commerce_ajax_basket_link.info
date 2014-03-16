@@ -1,0 +1,6 @@
+name = Ajax Basket Link (custom)
+description = Creates block containing a Drupal Commerce basket/cart link that updates on the fly as items are added (with customizations).
+core = 7.x
+package = Commerce (contrib)
+dependencies[] = commerce
+dependencies[] = commerce_cart

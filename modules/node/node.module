@@ -3321,7 +3321,7 @@ function _node_query_node_access_alter($query, $type) {
     return;
   }
 
-  $tables = $query->getTables();
+  $tables = &$query->getTables();
   $base_table = $query->getMetaData('base_table');
   // If no base table is specified explicitly, search for one.
   if (!$base_table) {
@@ -3402,6 +3402,13 @@ function _node_query_node_access_alter($query, $type) {
       $subquery = db_select('node_access', 'na')
        ->fields('na', array('nid'));
 
+      // Increment the placeholder index on the subquery until it matches the
+      // placeholders used by the main query.
+      $np = count($query->getArguments());
+      while ($np--) {
+        $subquery->nextPlaceholder();
+      }
+
       $grant_conditions = db_or();
       // If any grant exists for the specified user, then user has access
       // to the node for the specified operation.
@@ -3434,7 +3441,22 @@ function _node_query_node_access_alter($query, $type) {
       }
       // Otherwise attach it to the node query itself.
       else {
-        $query->exists($subquery);
+        if (empty($tableinfo['join type'])) {
+          // If we are looking at the main table of the query, apply the
+          // subquery directly.
+          $query->exists($subquery);
+        }
+        else {
+          // If we are looking at a joined table, add the node access check
+          // to the join condition.
+          $tables[$nalias]['condition'] .= ' AND EXISTS(' . (string)$subquery . ')';
+          $tables[$nalias]['arguments'] += $subquery->arguments();
+          // Increment the placeholder count on the main query until it matches the placeholders
+          // used by the subquery.
+          foreach ($subquery->arguments() as $_a) {
+            $query->nextPlaceholder();
+          }
+        }
       }
     }
   }

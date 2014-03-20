@@ -1,0 +1,31 @@
+<?php
+
+/**
+* Implements hook_library().
+*/
+function custom_stepug_library() {
+  $libraries['jquery_ui_spinner'] = array(
+    'title' => 'jQuery Spinner',
+    'website' => 'http://github.com/btburnett3/jquery.ui.spinner/',
+    'version' => '1.8',
+    'js' => array(
+      libraries_get_path('jquery_ui_spinner') . '/ui.spinner.min.js' => array(),
+    ),
+    'css' => array(
+      libraries_get_path('jquery_ui_spinner') . '/ui.spinner.css' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'ui.widget'),
+    ),
+  );
+  return $libraries;
+}
+
+function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
+  if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
+    $form['#attached']['library'][] = array('custom_stepug', 'jquery_ui_spinner');
+    //dsm($form);
+    $form['quantity']['#title'] = '';
+    $form['quantity']['#size'] = 1;
+  }
+}

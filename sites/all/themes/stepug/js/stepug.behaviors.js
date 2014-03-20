@@ -57,4 +57,15 @@
     }
   };
 
+    // Add a spinner on quantity widget.
+    Drupal.behaviors.quantityWidgetSpinner = {
+        attach: function ( context, settings ) {
+            $('.form-item-quantity input').spinner({
+                min: 1,
+                max: 99,
+                increment: 'fast'
+            });
+        }
+    }
+
 })(jQuery);

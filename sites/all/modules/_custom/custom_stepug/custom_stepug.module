@@ -29,3 +29,32 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
     $form['quantity']['#size'] = 1;
   }
 }
+
+/**
+ * Implement hook_block_info().
+ */
+function custom_stepug_block_info() {
+  $blocks = array();
+  $blocks['stepug_user_links'] = array(
+    'info' => t('LoginToboggan logged in block'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implement hook_block_view().
+ */
+function custom_stepug_block_view($delta = '') {
+  global $user;
+
+  $block = array();
+  switch ($delta) {
+    case 'stepug_user_links':
+      if ($user->uid) {
+        $block['content'] = l($user->name, 'user/' . $user->uid) .' | ' . l(t('Log out'), 'user/logout');
+      }
+      break;
+  }
+  return $block;
+}

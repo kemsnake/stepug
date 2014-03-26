@@ -97,11 +97,11 @@ img, media {
     padding-right:25px;
 }
 #block-commerce-ajax-basket-link-commerce-ajax-basket-link,
-#block-logintoboggan-logintoboggan-logged-in,
+#block-custom-stepug-stepug-user-links,
 #block-ajax-register-ajax-register-block {
     float:right;
 }
-#block-logintoboggan-logintoboggan-logged-in .block__content{
+#block-custom-stepug-stepug-user-links .block__content{
     margin: 1em;
 }
 .ajax-register-links-wrapper{

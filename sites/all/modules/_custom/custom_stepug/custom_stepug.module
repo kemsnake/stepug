@@ -36,7 +36,7 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
 function custom_stepug_block_info() {
   $blocks = array();
   $blocks['stepug_user_links'] = array(
-    'info' => t('LoginToboggan logged in block'),
+    'info' => t('Stepug user links block'),
     'cache' => DRUPAL_NO_CACHE,
   );
   return $blocks;

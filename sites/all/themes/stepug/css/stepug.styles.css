@@ -101,6 +101,9 @@ img, media {
 #block-ajax-register-ajax-register-block {
     float:right;
 }
+#block-logintoboggan-logintoboggan-logged-in .block__content{
+    margin: 1em;
+}
 .ajax-register-links-wrapper{
     overflow: hidden;
     float:right;

@@ -96,9 +96,8 @@ img, media {
     float:left;
     padding-right:25px;
 }
-#block-commerce-ajax-basket-link-commerce-ajax-basket-link {
-    float:right;
-}
+#block-commerce-ajax-basket-link-commerce-ajax-basket-link,
+#block-logintoboggan-logintoboggan-logged-in,
 #block-ajax-register-ajax-register-block {
     float:right;
 }

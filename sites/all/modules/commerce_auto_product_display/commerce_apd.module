@@ -1,0 +1,430 @@
+<?php
+
+/**
+ * @file
+ * Contain main functions for Auto Product Display
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_apd_menu() {
+  // Add menu to open the configuration page.
+  $items["admin/commerce/config/auto-product-display"] = array(
+    "title" => "Auto product display",
+    "description" => "Configure the auto product display behavior.",
+    "type" => MENU_NORMAL_ITEM,
+    "access arguments" => array("configure auto product display"),
+    "page callback" => "drupal_get_form",
+    "page arguments" => array("_commerce_apd_configuration"),
+    "file" => "commerce_apd_admin.inc",
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ * Add permission to configure auto product display.
+ */
+function commerce_apd_permission() {
+  return array(
+    "configure auto product display" => array(
+      "title" => t("configure auto product display"),
+      "description" => t("Configure the auto product display behavior."),
+    )
+  );
+}
+
+/**
+ * Implements hook_form_alter().
+ * Alter the product creation form to add a new option to
+ * automatically create product display.
+ */
+function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form_state, $form_id) {
+  // Get the referencing node(s).
+  $existing_references = array();
+  if (isset($form_state['commerce_product']->product_id)) {
+    $referenced_from = _commerce_apd_get_nodes_referencing($form_state['commerce_product']->product_id);
+    if (!empty($referenced_from)) {
+      foreach ($referenced_from as $reference) {
+        $existing_references[] = $reference;
+      }
+    }
+  }
+
+  // Count the existing references.
+  $count_existing_references = count($existing_references);
+
+  // Unset session that holds the referenced node id if exists.
+  unset($_SESSION['commerce_apd_referenced_nid']);
+
+  // If new product creation or no referencing node found.
+  if (isset($form_state['commerce_product']->is_new) || $count_existing_references <= 1) {
+    // Check if the product display creation form should be displayed automatically.
+    $show_form = variable_get("commerce_apd_show_product_display_form", 0);
+
+    // Get the default content type for product display
+    $content_type = _commerce_apd_get_content_type($form_state['commerce_product']->type);
+
+    // If there is only one node referencing this product.
+    if ($count_existing_references == 1) {
+      // Load the node.
+      $node = node_load($existing_references[0]);
+
+      // Save node id to session for deciding to update node or create new node
+      // when the form is submitted.
+      $_SESSION['commerce_apd_referenced_nid'] = $existing_references[0];
+    }
+    else {
+      // Prepare node object.
+      $node = new stdClass();
+      $node->type = $content_type;
+    }
+
+    // Temporary variable for storing product display form
+    // that will be attached to product creation form.
+    $form2 = array();
+
+    // Attach the product display form to temporary variable.
+    field_attach_form('node', $node, $form2, $form_state);
+
+    // Get the field name which type is product reference.
+    $field_product = _commerce_apd_get_product_field($content_type);
+
+    // Unset product reference field.
+    unset($form2[$field_product]);
+
+    // Variables for storing the first and last field name.
+    $first = "";
+    $last = "";
+
+    // Count of fields in form.
+    $count = count($form2);
+
+    // The weight for make sure the attached form is placed
+    // below the product creation form.
+    $weight = $count;
+
+    // Attach the product display form to product creation variable.
+    field_attach_form('node', $node, $form, $form_state);
+
+    // Don't include the product reference field because it will be filled
+    // automatically after form submission.
+    unset($form[$field_product]);
+
+    // Sort the form based on field's weight
+    $sort_key = array();
+    foreach ($form2 as $field => $value) {
+      if (substr($field, 0, 1) != '#') {
+        $sort_key[] = $value['#weight'];
+      }
+      else {
+        $sort_key[] = 0;
+      }
+    }
+    array_multisort($sort_key, SORT_ASC, $form2);
+
+    // Loop through fields in form in the temporary variables.
+    foreach ($form2 as $field => $value) {
+      // The field name has no '#' prefix.
+      if (substr($field, 0, 1) != '#') {
+        if ($first == "") {
+          // Fill the first field.
+          $first = $field;
+          $last = $field;
+        }
+        else {
+          // Fill the last field.
+          $last = $field;
+        }
+
+        // Decrement for weight
+        $weight--;
+
+        // Update field's weight.
+        $form[$field]['#weight'] = $form['actions']['#weight'] - $weight;
+      }
+    }
+
+    // Show the checkbox if the form for creating product display is not configured
+    // to be displayed automatically and there is no node referencing to it.
+    if ($show_form == 0 && $count_existing_references == 0) {
+      // Display the option for creating product display.
+      $form['auto_display'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Create product display'),
+        '#description' => t('Check this options if you want to create the display for this product.'),
+        '#weight' => $form['actions']['#weight'] - $count - 1,
+        '#attributes' => array(
+          'onclick' => 'if (this.checked==true) { jQuery("#create-display-fieldset").show(); } else { jQuery("#create-display-fieldset").hide(); }',
+          'id' => 'auto-display-checkbox',
+        ),
+      );
+    }
+
+    // Based on the first and the last field name, we can wrap the attached form
+    // with fieldset.
+    $form[$first]['#prefix'] = '<fieldset id="create-display-fieldset" class="form-wrapper">' .
+      (($show_form == 0 && $count_existing_references == 0) ? '<legend><span class="fieldset-legend">' . t('Product display') . '</span></legend>' : '') .
+      '<div class="fieldset-wrapper">';
+    $form[$last]['#suffix'] = '</div></fieldset>';
+
+    // Add submit handler function.
+    $form['actions']['submit']['#submit'][] = 'commerce_apd_product_form_reference_submit';
+
+    // Hide the form for creating product display if it is not configured
+    // to be displayed automatically and there is no node referencing to it.
+    if ($show_form == 0 && $count_existing_references == 0) {
+      // The javascript for hiding the product display creation form
+      // for the first time.
+      drupal_add_js('jQuery(document).ready(function(){ if (jQuery("#auto-display-checkbox").attr("checked")=="checked") { jQuery("#create-display-fieldset").show(); } else { jQuery("#create-display-fieldset").hide(); } })', 'inline');
+    }
+  }
+  else {
+    // If there are more than one nodes referencing this product,
+    // they will be displayed is list with the update link.
+    // Fieldset for containing the list.
+    $form['referencing_nodes'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Product display'),
+      '#weight' => $form['actions']['#weight'],
+    );
+
+    // Get the referencing nodes including the 'update' link
+    // for updating the product display.
+    $rows = array();
+    foreach ($existing_references as $key => $existing_reference) {
+      $rows[] = _commerce_apd_get_product_reference_detail($existing_reference, $form_state['commerce_product']->product_id);
+    }
+
+    // Finally, display them in a table.
+    $form['referencing_nodes']['table'] = array(
+      '#theme' => 'table',
+      '#header' => array('Title', 'Action'),
+      '#rows' => $rows,
+      '#empty' => t('No content available.'),
+    );
+  }
+}
+
+/**
+ * Handle the form submission process. Product display will be created here.
+ */
+function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
+  global $user;
+
+  // Check if the form for creating product display is configured to be displayed automatically.
+  $show_form = variable_get("commerce_apd_show_product_display_form", 0);
+
+  // Get the value of "create product display" checkbox if it exists.
+  $auto_display = isset($form_state['values']['auto_display']) ? $form_state['values']['auto_display'] : FALSE;
+
+  // Check if the product display should be created automatically or
+  // the form for creating product display is configured to be displayed automatically.
+  if ($auto_display == TRUE || $show_form == 1 || isset($_SESSION['commerce_apd_referenced_nid'])) {
+    // Get the default content type for product display
+    $content_type = _commerce_apd_get_content_type($form_state['commerce_product']->type);
+
+    // Get the field name which type is product reference.
+    $field_product = _commerce_apd_get_product_field($content_type);
+
+    // Set language
+    $lang = LANGUAGE_NONE;
+
+    // If there is no session storing the referenced node id, create a new node
+    if (!isset($_SESSION['commerce_apd_referenced_nid'])) {
+      // Set some fields value.
+      $node = new stdClass();
+      $node->is_new = TRUE;
+      $node->type = $content_type;
+      $node->status = 1;
+      $node->uid = $user->uid;
+      $node->title = $form_state['values']['title'];
+
+      // Variable for storing temporary attached form.
+      $form2 = array();
+
+      // Variable for storing product display form which
+      // fields will be attached to node.
+      $node_form = array();
+
+      // Attached product display form to retreive its field.
+      field_attach_form('node', $node, $form2, $form_state);
+
+      // Unset the product reference field.
+      unset($form2[$field_product]);
+
+      // Loop through attached form
+      foreach ($form2 as $field => $value) {
+        // Fill the node form for submission.
+        $node_form[$field] = $form[$field];
+      }
+
+      // Add other fields (if any) to the node class,
+      // so they value can also be saved.
+      entity_form_submit_build_entity('node', $node, $node_form, $form_state);
+
+      // Save the product reference field.
+      $node->$field_product = array(
+        $lang => array(
+          array('product_id' => $form_state['build_info']['args'][0]->product_id),
+        ),
+      );
+
+      // Check node promotion and sticky option.
+      $options = variable_get('node_options_' . $node->type, array());
+      if (count($options) == 0 || in_array('promote', $options)) {
+        $node->promote = 1;
+      }
+      if (in_array('sticky', $options)) {
+        $node->sticky = 1;
+      }
+
+      // Check node comment option.
+      $options = variable_get('comment_' . $node->type, array());
+      if (count($options) == 0) {
+        // Comment is open by default.
+        $node->comment = 2;
+      }
+      else {
+        $node->comment = intval($options);
+      }
+
+      // Set language here.
+      $node->language = $lang;
+
+      // Finally save it.
+      node_save($node);
+    }
+    else {
+      // Update existing node.
+      $node = node_load($_SESSION['commerce_apd_referenced_nid']);
+
+      // Make sure if node exists.
+      if (is_object($node)) {
+        // Variable for storing temporary attached form.
+        $form2 = array();
+
+        // Variable for storing product display form which
+        // fields will be attached to node.
+        $node_form = array();
+
+        // Attached product display form to retreive its field.
+        field_attach_form('node', $node, $form2, $form_state);
+
+        // Unset the product reference field.
+        unset($form2[$field_product]);
+
+        // Loop through attached form
+        foreach ($form2 as $field => $value) {
+          // Fill the node form for submission.
+          $node_form[$field] = $form[$field];
+        }
+
+        // Add other fields (if any) to the node class,
+        // so they value can also be saved.
+        entity_form_submit_build_entity('node', $node, $node_form, $form_state);
+
+        // Set language here.
+        $node->language = $lang;
+
+        // Check node revision option.
+        $options = variable_get('node_options_' . $node->type, array());
+        $node->revision = in_array('revision', $options);
+
+        // Finally update it.
+        node_save($node);
+      }
+    }
+  }
+}
+
+/**
+ * Get the field name in product display that has reference to product.
+ */
+function _commerce_apd_get_product_reference_fields() {
+  $product_reference_fields = array();
+  $fields = field_info_fields();
+  foreach ($fields as $field) {
+    if ($field['type'] == 'commerce_product_reference' && $field['field_name'] != 'commerce_product') {
+      $product_reference_fields[] = $field['field_name'];
+    }
+  }
+  return $product_reference_fields;
+}
+
+/**
+ * Get the entities that has reference to a product.
+ */
+function _commerce_apd_get_nodes_referencing($product_id) {
+  $product_fields = _commerce_apd_get_product_reference_fields();
+  $entities = array();
+  foreach ($product_fields as $field) {
+    $result = db_query(
+      'SELECT entity_id FROM {field_data_' . $field . '} df WHERE df.' . $field . '_product_id = :pid',
+      array(
+        ':pid' => $product_id,
+      )
+    );
+
+    foreach ($result as $reference) {
+      $entities[] = $reference->entity_id;
+    }
+  }
+  return $entities;
+}
+
+/**
+ * Get the detail information of node that has reference to a product.
+ */
+function _commerce_apd_get_product_reference_detail($existing_reference, $product_id) {
+  if ($existing_reference != '') {
+    $node_obj = db_query('SELECT n.nid, n.title FROM {node} n WHERE nid = :nid', array(':nid' => $existing_reference))->fetchObject();
+    $node_title = $node_obj->title;
+    $node_id = $node_obj->nid;
+  }
+  else {
+    $node_title = '';
+    $node_id = '';
+  }
+
+  return array(
+    'title' => $node_title,
+    'link' => l(t('view'), 'node/' . $node_id) . ' &nbsp;&nbsp;&nbsp; ' . l(t('edit'), 'node/' . $node_id . '/edit', array('query' => array('destination' => 'admin/commerce/products/' . $product_id . '/edit?destination=admin/commerce/products'))),
+  );
+}
+
+/**
+ * Get one field from content type which type is product reference.
+ */
+function _commerce_apd_get_product_field($content_type) {
+  $field = "";
+
+  // Select the product reference field from content type.
+  $rs = db_query("SELECT a.field_name FROM {field_config_instance} a
+    INNER JOIN {field_config} b ON a.field_id = b.id
+    WHERE a.entity_type='node' AND a.bundle='" . $content_type . "' AND
+      b.type='commerce_product_reference' AND b.module='commerce_product_reference' LIMIT 0,1");
+  if ($rs->rowCount() > 0) {
+    $data = $rs->fetchObject();
+    $field = $data->field_name;
+  }
+
+  return $field;
+}
+
+/**
+ * Get default product display content type for product.
+ */
+function _commerce_apd_get_content_type($product_type) {
+  $content_type = variable_get("commerce_apd_product_display", array());
+  if (isset($content_type[$product_type])) {
+    $content_type = $content_type[$product_type];
+  }
+  else {
+    $content_type = "product_display";
+  }
+
+  return $content_type;
+}

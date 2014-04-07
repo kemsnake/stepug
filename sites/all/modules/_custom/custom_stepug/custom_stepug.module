@@ -24,9 +24,17 @@ function custom_stepug_library() {
 function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
     $form['#attached']['library'][] = array('custom_stepug', 'jquery_ui_spinner');
-    //dsm($form);
     $form['quantity']['#title'] = '';
     $form['quantity']['#size'] = 1;
+  }
+
+  //Прячем кнопку поиска и делаем плэйсхолдер для поля поиска
+  if ($form_id == 'search_api_page_search_form_main_search') {
+    $id = $form['id']['#value'];
+    $form['submit_' . $id] = array(
+      '#access' => FALSE,
+    );
+    $form['keys_' . $id]['#attributes']['placeholder'] = t('Search');
   }
 }
 

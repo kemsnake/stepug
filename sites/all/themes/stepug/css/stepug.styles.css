@@ -115,3 +115,9 @@ img, media {
     float: left;
 }
 /* end site header */
+
+/* category facet */
+.form-type-bef-link-child {
+    margin-left: 10px;
+}
+/* end category facet */

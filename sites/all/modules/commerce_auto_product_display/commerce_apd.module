@@ -257,8 +257,11 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
 
       // Loop through attached form
       foreach ($form2 as $field => $value) {
-        // Fill the node form for submission.
-        $node_form[$field] = $form[$field];
+        // @todo delete hardcode after metatags updated
+        if ($field != '#metatags') {
+          // Fill the node form for submission.
+          $node_form[$field] = $form[$field];
+        }
       }
 
       // Add other fields (if any) to the node class,

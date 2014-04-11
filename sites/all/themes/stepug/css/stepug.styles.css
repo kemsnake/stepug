@@ -11,30 +11,27 @@ img, media {
     border: none;
     display: block;
     float:left;
-    border-radius: 25px;
+    border-radius: 15px;
     padding:10px;
     background: none;
 }
 
 .view-popular-products .view-content .views-row:hover {
-    //background: lightgray;
-    border: 1px inset gray;
+    //border: 1px outset gray;
+    background: #F5F5F5;
 }
 .view-popular-products .view-content .views-row .views-field-title {
     height:40px;
     text-align: center;
+    background: white!important;
 }
 
 .view-popular-products .view-content .views-row .views-field-field-field-product-photo {
     height:245px;
     text-align: center;
+    background: white!important;
 }
 
-.view-popular-products .view-content .views-row .views-field-commerce-price {
-    float: right;
-    clear:both;
-    margin-bottom: 5px;
-}
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form .form-item-quantity {
     float:left;
     margin-right: 10px;
@@ -45,14 +42,27 @@ img, media {
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form {
     float: right;
     clear:both;
+    background: white!important;
+    width:100%;
 }
+.view-popular-products .view-content .views-row .views-field-add-to-cart-form .field-content{
+    float: right;
+    display: block;
+    padding-right: 5px;
 
+}
+.view-popular-products .view-content .views-row .views-field-commerce-price {
+    text-align: right;
+    float: right;
+    clear:both;
+    padding-bottom: 5px;
+    background: white!important;
+    width:100%;
+}
 
 .view-popular-products .view-content .views-row .views-field-commerce-price .field-content {
-    float: left;
-}
-.view-popular-products .view-content .views-row .views-label-commerce-price {
-    float: left;
+    float: right;
+    padding-right: 5px;
 }
 
 

@@ -174,9 +174,9 @@ Drupal.behaviors.dhtmlMenu = {
     });
 
     // When using LTR, all icons can be shifted as one, as the text width is not relevant.
-    if (settings.nav == 'bullet' && !rtl) {
+      if (settings.nav == 'bullet' && !rtl && $('.menu li.dhtml-folder').length) {
       // Shift overlay to the left by the width of the icon and the distance between icon and text.
-      var shift = '-' + (Math.ceil(($('.menu li').css('margin-left').replace('px', ''))) + 16) + 'px';
+          var shift = '-' + (Math.ceil(($('.menu li.dhtml-folder').css('margin-left').replace('px', ''))) + 16) + 'px';
       // Shift the overlay using a negative left-hand offset, and the text using a negative right-hand margin.
       $('.dhtml-menu-icon').css('left', shift).css('margin-right', shift);
     }

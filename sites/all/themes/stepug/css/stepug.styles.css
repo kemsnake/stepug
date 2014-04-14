@@ -5,6 +5,7 @@ img, media {
 /* No files to import found in partials/components/**\/* */
 
 /* popular products block */
+.search-results .search-result,
 .view-popular-products .view-content .views-row {
     width: 24%;
     margin-right: 1%;
@@ -16,41 +17,49 @@ img, media {
     background: none;
 }
 
+.search-results .search-result:hover,
 .view-popular-products .view-content .views-row:hover {
-    //border: 1px outset gray;
     background: #F5F5F5;
 }
+.search-results .search-result .field-title,
 .view-popular-products .view-content .views-row .views-field-title {
     height:40px;
     text-align: center;
     background: white!important;
 }
 
+.search-results .search-result .field-product-photo,
 .view-popular-products .view-content .views-row .views-field-field-field-product-photo {
     height:245px;
     text-align: center;
     background: white!important;
 }
 
+.search-results .search-result .field-add-to-cart-form .form-item-quantity,
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form .form-item-quantity {
     float:left;
     margin-right: 10px;
 }
+.search-results .search-result .field-add-to-cart-form .form-submit,
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form .form-submit {
     float: left;
 }
+.search-results .search-result .field-add-to-cart-form,
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form {
     float: right;
     clear:both;
     background: white!important;
     width:100%;
 }
+.search-results .search-result .field-add-to-cart-form .commerce-add-to-cart,
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form .field-content{
     float: right;
     display: block;
     padding-right: 5px;
 
 }
+
+.search-results .search-result .field-product-price,
 .view-popular-products .view-content .views-row .views-field-commerce-price {
     text-align: right;
     float: right;
@@ -60,6 +69,7 @@ img, media {
     width:100%;
 }
 
+.search-results .search-result .field-product-price,
 .view-popular-products .view-content .views-row .views-field-commerce-price .field-content {
     float: right;
     padding-right: 5px;
@@ -132,3 +142,16 @@ img, media {
 }
 /* end category block */
 
+/* breadcrumb */
+.breadcrumb {
+    width: 100%;
+    display: block;
+    float: left;
+    padding: 0;
+}
+.breadcrumb li {
+    list-style-type: none;
+    float: left;
+    margin-right: 15px;
+}
+/* end breadcrumb */

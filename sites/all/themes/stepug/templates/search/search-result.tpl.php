@@ -64,18 +64,21 @@
  * @ingroup themeable
  */
 ?>
-<article class="<?php print $classes; ?>"<?php print $attributes; ?>>
-  <?php if ($product_photo): ?>
+<article class="search-result <?php print $classes; ?>"<?php print $attributes; ?>>
 
-    <div class="field-product-photo"><a href="<?php print $url; ?>"><?php print $title; ?><?php print $product_photo; ?></a></div>
+  <?php if ($product_photo): ?>
+    <div class="field-product-photo"><a href="<?php print $url; ?>"><?php print $product_photo; ?></a></div>
   <?php endif; ?>
+
   <?php print render($title_prefix); ?>
-    <h3 <?php print $title_attributes; ?>><a href="<?php print $url; ?>"><?php print $title; ?></a></h3>
+    <div class="field-title" <?php print $title_attributes; ?>><a href="<?php print $url; ?>"><?php print $title; ?></a></div>
   <?php print render($title_suffix); ?>
+
   <?php if ($product_price): ?>
-    <div class="field-product-rice"><?php print $product_price; ?></div>
+    <div class="field-product-price"><?php print $product_price; ?></div>
   <?php endif; ?>
-  <?php if ($info): ?>
-    <footer class="search-result__info"><?php print $info; ?></footer>
+
+  <?php if ($add_to_cart_form): ?>
+    <div class="field-add-to-cart-form"><?php print $add_to_cart_form; ?></div>
   <?php endif; ?>
 </article>

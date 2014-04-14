@@ -33,6 +33,11 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
     $form['search_block_form']['#attributes']['placeholder'] = t('Search');
     $form['actions']['#attributes']['class'][] = 'element-invisible';
   }
+
+  // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара
+  if ($form_id == 'search_form') {
+    $form['#access'] = FALSE;
+  }
 }
 
 /**

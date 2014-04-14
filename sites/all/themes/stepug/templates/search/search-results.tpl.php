@@ -24,7 +24,6 @@
  */
 ?>
 <?php if ($search_results): ?>
-  <h2><?php print t('Search results');?></h2>
   <section class="search-results">
     <?php print $search_results; ?>
   </section>

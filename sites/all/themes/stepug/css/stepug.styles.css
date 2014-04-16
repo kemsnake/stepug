@@ -51,12 +51,17 @@ img, media {
     background: white!important;
     width:100%;
 }
+.ajax-progress .throbber,
+.view-popular-products .view-content .views-row .views-field-add-to-cart-form p,
+.search-results .search-result .field-add-to-cart-form .commerce-add-to-cart p {
+    margin: 0;
+    float: left;
+}
 .search-results .search-result .field-add-to-cart-form .commerce-add-to-cart,
 .view-popular-products .view-content .views-row .views-field-add-to-cart-form .field-content{
     float: right;
     display: block;
     padding-right: 5px;
-
 }
 
 .search-results .search-result .field-product-price,
@@ -138,30 +143,26 @@ img, media {
 
 /* category block */
 #block-menu-menu-categories ul {
-    margin: 0.3em 0;
+    margin: 0.3em 0 0.3em 0.9em;
 }
-/* end category block */
-
-/* breadcrumb */
-.breadcrumb {
-    width: 100%;
-    display: block;
-    float: left;
+#block-menu-menu-categories > ul {
     padding: 0;
 }
-.breadcrumb li {
-    list-style-type: none;
-    float: left;
-    margin-right: 15px;
+
+#block-menu-menu-categories ul li.dhtml-folder.expanded {
+    list-style-image: url("../images/menu-expanded.png") !important;
 }
-/* end breadcrumb */
+#block-menu-menu-categories ul li.dhtml-folder.collapsed {
+    list-style-image: url("../images/menu-collapsed.png") !important;
+}
+/* end category block */
 
 /* site navigation */
 #block-system-main-menu {
     overflow: hidden;
     background: rgb(253,240,221);
     border-radius: 10px;
-    border: 1px solid lightgoldenrodyellow;
+    //border: 1px solid lightgoldenrodyellow;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 

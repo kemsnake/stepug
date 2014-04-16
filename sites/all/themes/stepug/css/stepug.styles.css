@@ -155,3 +155,13 @@ img, media {
     margin-right: 15px;
 }
 /* end breadcrumb */
+
+/* site navigation */
+#block-system-main-menu ul li {
+    list-style: none;
+    float: left;
+    width:16%;
+}
+
+/* end site navigation */
+

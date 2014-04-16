@@ -31,7 +31,7 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   //Прячем кнопку поиска и делаем плэйсхолдер для поля поиска
   if ($form_id == 'search_block_form') {
     $form['search_block_form']['#attributes']['placeholder'] = t('Search');
-    $form['actions']['#attributes']['class'][] = 'element-invisible';
+    //$form['actions']['#attributes']['class'][] = 'element-invisible';
   }
 
   // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара

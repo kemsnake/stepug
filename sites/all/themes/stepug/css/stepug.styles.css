@@ -169,6 +169,9 @@ img, media {
     display: block;
     overflow: hidden;
 }
+#block-system-main-menu ul {
+    float:right;
+}
 #block-system-main-menu ul li {
     list-style: none;
     float: left;
@@ -176,6 +179,7 @@ img, media {
 }
 #block-system-main-menu ul li a {
     font-size: 18px;
+    color:black;
 }
 /* end site navigation */
 

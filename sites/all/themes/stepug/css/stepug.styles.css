@@ -157,11 +157,25 @@ img, media {
 /* end breadcrumb */
 
 /* site navigation */
+#block-system-main-menu {
+    overflow: hidden;
+    background: rgb(253,240,221);
+    border-radius: 10px;
+    border: 1px solid lightgoldenrodyellow;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+#block-system-main-menu ul {
+    display: block;
+    overflow: hidden;
+}
 #block-system-main-menu ul li {
     list-style: none;
     float: left;
-    width:16%;
+    margin-right:70px;
 }
-
+#block-system-main-menu ul li a {
+    font-size: 18px;
+}
 /* end site navigation */
 

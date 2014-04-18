@@ -107,22 +107,14 @@ function stepug_price_formatted_components(&$variables) {
   return theme('table', array('rows' => $rows, 'attributes' => array('class' => array('commerce-price-formatted-components'))));
 }
 
-/**
- * Returns HTML for a breadcrumb trail.
- *
- * @param $variables
- *   An associative array containing:
- *   - breadcrumb: An array containing the breadcrumb links.
+/*
+ * Добавлеяем пункт "показать все" в пэйджер товаров
  */
-function stepug_breadcrumb($variables) {
-  $breadcrumb = $variables['breadcrumb'];
-
-  if (!empty($breadcrumb)) {
-    // Provide a navigational heading to give context for breadcrumb links to
-    // screen-reader users. Make the heading invisible with .element-invisible.
-    $output = '<h2 class="element-invisible">' . t('You are here') . '</h2>';
-
-    $output .= '<div class="breadcrumb">' . implode(' » ', $breadcrumb) . '</div>';
-    return $output;
+function stepug_process_item_list(&$variables){
+  if ($variables['attributes']['class'][0] == 'pager') {
+    $display_all_item['class'][] = 'pager__item';
+    $display_all_item['class'][] = 'pager-display-all';
+    $display_all_item['data'] = l(t('показать все'), 'taxonomy/term/' . arg(2) . '/all');
+    $variables['items'][] = $display_all_item;
   }
 }

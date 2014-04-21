@@ -30,7 +30,7 @@ img, media {
 
 .search-results .search-result .field-product-photo,
 .view-popular-products .view-content .views-row .views-field-field-field-product-photo {
-    height:245px;
+    height:255px;
     text-align: center;
     background: white!important;
 }

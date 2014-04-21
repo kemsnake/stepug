@@ -41,7 +41,7 @@ function commerce_ajax_basket_link_block_info() {
 function commerce_ajax_basket_link_static_output() {
 
   $order_data = commerce_ajax_basket_link_order_data();
-  $qty = format_plural($order_data['qty'], '1 item', '@count items');
+  $qty = format_plural($order_data['qty'], '1 item', '@count items', array(), array('context' => 'product count on a Commerce order'));
   $price = commerce_currency_format($order_data['total']['amount'], $order_data['total']['currency_code']);
 
   if ($qty > 0){

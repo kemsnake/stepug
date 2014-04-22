@@ -245,6 +245,10 @@ img, media {
 }
 .view-product-cataog .views-view-grid td {
     vertical-align: top;
+    padding-bottom: 30px;
+}
+.view-product-cataog .views-view-grid td .views-field-name {
+    height: 30px;
 }
 /* end catalog */
 

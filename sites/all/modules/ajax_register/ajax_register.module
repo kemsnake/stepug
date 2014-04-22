@@ -75,7 +75,7 @@ function ajax_register_block_configure() {
     '#type' => 'checkboxes',
     '#title' => t('Enabled links'),
     '#options' => array(
-      'login' => t('Log in'),
+      'login' => t('Login'),
       'register' => t('Create new account'),
       'password' => t('Request new password'),
     ),
@@ -395,8 +395,8 @@ function _ajax_register_ajax_links($links_enabled, $form_id = NULL) {
 
   // Add login button.
   if (in_array('login', $links_enabled) && (stripos($form_id, 'user_login') === FALSE)) {
-    $options['attributes']['title'] = t('Log in');
-    $links[] = l(t('Log in'), 'ajax_register/login/nojs', $options);
+    $options['attributes']['title'] = t('Login');
+    $links[] = l(t('Login'), 'ajax_register/login/nojs', $options);
   }
 
   // Add register button.

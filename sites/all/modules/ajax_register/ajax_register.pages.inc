@@ -38,7 +38,7 @@ function ajax_register_page_callback($form_type, $js) {
     }
     elseif ($form_type == 'login') {
       // Show USER LOGIN form.
-      $form_state['title'] = t('Login');
+      $form_state['title'] = t('Log in');
       $commands = ctools_modal_form_wrapper('user_login', $form_state);
     }
 

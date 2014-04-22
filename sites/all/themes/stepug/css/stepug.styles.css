@@ -238,3 +238,14 @@ img, media {
     padding-top: 38px;
 }
 /* end cart form */
+
+/* catalog */
+.view-product-cataog .views-view-grid {
+    width:100%;
+}
+.view-product-cataog .views-view-grid td {
+    vertical-align: top;
+}
+/* end catalog */
+
+

@@ -158,7 +158,7 @@ img, media {
 /* end category block */
 
 /* site navigation */
-#block-system-main-menu {
+.l-region--navigation {
     overflow: hidden;
     background: rgb(253,240,221);
     border-radius: 10px;
@@ -171,7 +171,9 @@ img, media {
     overflow: hidden;
 }
 #block-system-main-menu ul {
-    float:right;
+    float:left;
+    margin-left:20px;
+    padding: 0;
 }
 #block-system-main-menu ul li {
     list-style: none;

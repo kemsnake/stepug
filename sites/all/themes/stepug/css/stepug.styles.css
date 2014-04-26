@@ -158,7 +158,7 @@ img, media {
 /* end category block */
 
 /* site navigation */
-.l-region--navigation {
+#block-system-main-menu {
     overflow: hidden;
     background: rgb(253,240,221);
     border-radius: 10px;
@@ -171,9 +171,7 @@ img, media {
     overflow: hidden;
 }
 #block-system-main-menu ul {
-    float:left;
-    padding: 0;
-    margin-left: 20px;
+    float:right;
 }
 #block-system-main-menu ul li {
     list-style: none;
@@ -239,6 +237,22 @@ img, media {
 .view-commerce-cart-form .views-table tbody td.views-field-commerce-total {
     padding-top: 38px;
 }
+/* end cart form */
+
+/* catalog */
+.view-product-cataog .views-view-grid {
+    width:100%;
+}
+.view-product-cataog .views-view-grid td {
+    vertical-align: top;
+    padding-bottom: 30px;
+}
+.view-product-cataog .views-view-grid td .views-field-name {
+    height: 30px;
+}
+/* end catalog */
+
+
 /* end cart form */
 
 /* block-search-form */

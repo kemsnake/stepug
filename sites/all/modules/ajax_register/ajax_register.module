@@ -396,7 +396,7 @@ function _ajax_register_ajax_links($links_enabled, $form_id = NULL) {
   // Add login button.
   if (in_array('login', $links_enabled) && (stripos($form_id, 'user_login') === FALSE)) {
     $options['attributes']['title'] = t('Log in');
-    $links[] = l(t('Login'), 'ajax_register/login/nojs', $options);
+    $links[] = l(t('Log in'), 'ajax_register/login/nojs', $options);
   }
 
   // Add register button.

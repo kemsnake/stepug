@@ -158,7 +158,7 @@ img, media {
 /* end category block */
 
 /* site navigation */
-#block-system-main-menu {
+.l-region--navigation {
     overflow: hidden;
     background: rgb(253,240,221);
     border-radius: 10px;
@@ -171,7 +171,9 @@ img, media {
     overflow: hidden;
 }
 #block-system-main-menu ul {
-    float:right;
+    float:left;
+    padding: 0;
+    margin-left: 20px;
 }
 #block-system-main-menu ul li {
     list-style: none;
@@ -238,3 +240,11 @@ img, media {
     padding-top: 38px;
 }
 /* end cart form */
+
+/* block-search-form */
+#block-search-form {
+    float:left;
+    margin-top: 13px;
+    margin-right: 15px;
+}
+/* end block-search-form */

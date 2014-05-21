@@ -109,6 +109,7 @@ img, media {
 
 .l-branding {
     width: 38.20339%!important;
+    margin-bottom: 5px;
 }
 
 .l-region--header {
@@ -160,12 +161,30 @@ img, media {
 /* site navigation */
 .l-region--navigation {
     overflow: hidden;
-    background: rgb(253,240,221);
+    background: #d9cfc5;
     border-radius: 10px;
-    //border: 1px solid lightgoldenrodyellow;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    padding-top: 190px;
+    background-image:  url("../images/head_image.jpg");
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: 100%;
 }
 
+body {
+    background: url("../images/background.jpg") repeat;
+}
+.l-main {
+    background: white;
+    border-radius: 10px;
+    padding: 10px!important;
+}
+.l-content {
+    box-shadow: -23px 0 20px -23px rgba(0, 0, 0, .8);
+}
+.l-content h1{
+    margin-left: 10px;
+}
 #block-system-main-menu ul {
     display: block;
     overflow: hidden;

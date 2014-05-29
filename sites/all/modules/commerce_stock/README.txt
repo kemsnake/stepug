@@ -34,8 +34,37 @@ Important:
 If you want to be able to disable stock checking for individual products check
 the "Allow stock override for Product <product>".
 
+To Uninstall
+=============
+1. Go to Home > Administration > Store > Configuration > Stock management.
+2. Select the "simple stock management" tab.
+3. Un-Check all product types hit submit and confirm the "I understand that all
+   stock data will be permanently removed".
+4. go to the modules page & disable all stock modules.
+5. Go to the uninstall tab and uninstall all stock modules.
+
+Notes on Uninstall:
+* If you are planing on using a different version of stock or replace the stock
+  module with another / a custom system, you can keep the stock field and skip
+  steps 1 to 3. the stock field will be preserved and you will be able to use it
+  as any other drupal field.
+* If you forgot to follow steps 1 to 3 before uninstalling you can visit each of
+  the product bundles and delete the stock field from each of those.
+
 
 rules configuration
 ===================
 If you need to make changes to rules you also need the permission
 "Make rule based changes to commerce stock".
+to view and edit the rules see:
+admin/commerce/config/stock/validation
+and
+admin/commerce/config/stock/control
+
+Decimal Stock
+=============
+The editing of stock levels support decimal quantities, to enable this feature
+edit a product type (admin/commerce/products/types) and check the box
+"Allow decimal quantities for stock administration"
+to support decimal quantities on the add to basket use the module
+https://drupal.org/project/commerce_decimal_quantities

@@ -209,6 +209,12 @@ body {
     font-size: 18px;
     color:black;
 }
+
+.l-region--footer {
+    background: #d9cfc5;
+    border-radius: 15px;
+    padding:10px;
+}
 /* end site navigation */
 
 /* cart form */

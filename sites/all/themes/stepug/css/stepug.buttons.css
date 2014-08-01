@@ -1,0 +1,88 @@
+#edit-submit--2 {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #eae0c2), color-stop(1, #ccc2a6));
+    background:-moz-linear-gradient(top, #eae0c2 5%, #ccc2a6 100%);
+    background:-webkit-linear-gradient(top, #eae0c2 5%, #ccc2a6 100%);
+    background:-o-linear-gradient(top, #eae0c2 5%, #ccc2a6 100%);
+    background:-ms-linear-gradient(top, #eae0c2 5%, #ccc2a6 100%);
+    background:linear-gradient(to bottom, #eae0c2 5%, #ccc2a6 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#eae0c2', endColorstr='#ccc2a6',GradientType=0);
+    background-color:#eae0c2;
+    border:1px solid #333029;
+    display:inline-block;
+    cursor:pointer;
+    color:#505739;
+    font-size:13px;
+    font-weight:bold;
+    padding:3px 12px;
+    text-decoration:none;
+}
+#edit-submit--2:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ccc2a6), color-stop(1, #eae0c2));
+    background:-moz-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
+    background:-webkit-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
+    background:-o-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
+    background:-ms-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
+    background:linear-gradient(to bottom, #ccc2a6 5%, #eae0c2 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ccc2a6', endColorstr='#eae0c2',GradientType=0);
+    background-color:#ccc2a6;
+}
+
+.delete-line-item {
+    background-color:#ffffff;
+    color:#000000;
+    background-image: url(../images/button_cancel.ico);
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-position: 0px 0px;  /* equivalent to 'top left' */
+    border: none;           /* assuming we don't want any borders */
+    cursor: pointer;        /* make the cursor like hovering over an <a> element */
+    height: 24px;           /* make this the size of your image */
+    padding-left: 32px!important;     /* make text start to the right of the image */
+    vertical-align: middle; /* align the text vertically centered */
+}
+.delete-line-item:hover {
+    text-decoration: underline;
+}
+
+#edit-checkout,
+.checkout-continue {
+    background-color:#89c403;
+    border:1px solid #74b807;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:bold;
+    padding:3px 12px;
+    text-decoration:none;
+    height: 24px;
+}
+#edit-checkout:hover,
+.checkout-continue:hover {
+    background-color:#77a809;
+}
+
+#views-form-commerce-cart-form-default #edit-submit {
+    background-color:#ffc477;
+    border:1px solid #eeb44f;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:bold;
+    padding:3px 12px;
+    text-decoration:none;
+    background-image: url(../images/button_update.ico);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    height: 24px;
+    padding-left: 32px!important;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+#views-form-commerce-cart-form-default #edit-submit:hover {
+    background-color:#ffab23;
+}
+
+.button-operator {
+    margin-left: 10px;
+}

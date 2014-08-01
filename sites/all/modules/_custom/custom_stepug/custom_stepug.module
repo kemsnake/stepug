@@ -68,3 +68,12 @@ function custom_stepug_block_view($delta = '') {
   }
   return $block;
 }
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function custom_stepug_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'addressfield') {
+    return 'plugins/' . $plugin;
+  }
+}

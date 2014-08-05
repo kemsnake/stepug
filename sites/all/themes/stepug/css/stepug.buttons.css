@@ -61,6 +61,24 @@
     background-color:#77a809;
 }
 
+.checkout-buttons .checkout-cancel,
+.checkout-buttons .checkout-back {
+    background-color:#d0451b!important;
+    border:1px solid #942911;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff!important;
+    font-size:13px;
+    font-weight:bold;
+    padding:3px 12px;
+    text-decoration:none;
+    height: 24px;
+}
+.checkout-buttons .checkout-cancel:hover,
+.checkout-buttons .checkout-back:hover {
+    background-color:#bc3315!important;
+}
+
 #views-form-commerce-cart-form-default #edit-submit {
     background-color:#ffc477;
     border:1px solid #eeb44f;
@@ -84,5 +102,6 @@
 }
 
 .button-operator {
-    margin-left: 10px;
+    margin-left: 1em;
+    margin-right: 1em;
 }

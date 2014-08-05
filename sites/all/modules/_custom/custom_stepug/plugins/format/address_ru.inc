@@ -21,7 +21,7 @@ function custom_stepug_format_address_generate(&$format, $address, $context = ar
   // We start with a reasonable default: a simple block format suitable
   // for international shipping. We extend it with country-specific heuristics
   // below.
-dsm($format);
+
   // The street block.
   $format['street_block'] = array(
     '#type' => 'addressfield_container',
@@ -87,6 +87,19 @@ dsm($format);
     '#weight' => 2,
   );
 
+  $format['country'] = array(
+    '#access' => FALSE,
+    '#title' => t('Country'),
+    '#options' => _addressfield_country_options_list(),
+    '#render_option_value' => TRUE,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'class' => array('country'),
+      'x-autocompletetype' => 'country',
+      'autocomplete' => 'country',
+    ),
+    '#weight' => 100,
+  );
 
   if ($context['mode'] == 'form') {
     // Provide a wrapper ID for AJAX replacement based on country selection.

@@ -409,6 +409,10 @@ table.commerce-price-formatted-components td {
 .node--product-display--full .commerce-product-field-field-field-product-photo .field__item {
     text-align: center;
 }
-.node--product-display--full .commerce-product-field-field-field-product-photo a img{
-    border: none;
+.node--product-display--full .commerce-product-field-field-field-product-photo a{
+    outline: none;
+}
+.tabs a:visited,
+.tabs a {
+    color: black;
 }

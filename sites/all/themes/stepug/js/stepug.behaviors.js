@@ -60,6 +60,13 @@
     // Add a spinner on quantity widget.
     Drupal.behaviors.quantityWidgetSpinner = {
         attach: function ( context, settings ) {
+            // скрываем поле количество если товара нет в наличии
+            $('.commerce-add-to-cart .form-button-disabled').each(function(){
+                var parent = $(this).parent().parent();
+                console.log();
+                $('#' + parent.attr('id') + ' .form-item-quantity').css('display', 'none');
+            });
+            // добавляем спиннер(стрелки) к полю количество
             var quantity = $('.form-item-quantity input');
             if (quantity.length > 0){
                 quantity.spinner({

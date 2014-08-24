@@ -150,6 +150,15 @@ img, media {
     padding: 0;
 }
 
+#block-menu-menu-categories ul ul{
+    padding-left: 20px;
+}
+
+#block-menu-menu-categories ul ul li,
+#block-menu-menu-categories ul ul li{
+    margin-bottom: 5px;
+}
+
 #block-menu-menu-categories ul li.dhtml-folder.expanded {
     list-style-image: url("../images/menu-expanded.png") !important;
 }
@@ -203,7 +212,7 @@ body {
 #block-system-main-menu ul li {
     list-style: none;
     float: left;
-    margin-right:70px;
+    margin-right:80px;
 }
 #block-system-main-menu ul li a {
     font-size: 18px;

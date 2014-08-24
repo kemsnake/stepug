@@ -405,3 +405,10 @@ table.commerce-price-formatted-components td {
     z-index: 501;
 }
 /* end throbber */
+
+.node--product-display--full .commerce-product-field-field-field-product-photo .field__item {
+    text-align: center;
+}
+.node--product-display--full .commerce-product-field-field-field-product-photo a img{
+    border: none;
+}

@@ -409,8 +409,8 @@ table.commerce-price-formatted-components td {
 .node--product-display--full .commerce-product-field-field-field-product-photo .field__item {
     text-align: center;
 }
-.node--product-display--full .commerce-product-field-field-field-product-photo a{
-    outline: none;
+a{
+    outline: none!important;
 }
 .tabs a:visited,
 .tabs a {

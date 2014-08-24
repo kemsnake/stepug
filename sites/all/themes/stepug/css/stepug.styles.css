@@ -151,10 +151,10 @@ img, media {
 }
 
 #block-menu-menu-categories ul ul{
-    padding-left: 20px;
+    padding-left: 15px;
 }
 
-#block-menu-menu-categories ul ul li,
+#block-menu-menu-categories ul li,
 #block-menu-menu-categories ul ul li{
     margin-bottom: 5px;
 }

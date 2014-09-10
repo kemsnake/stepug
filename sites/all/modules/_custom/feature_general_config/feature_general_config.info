@@ -103,6 +103,7 @@ features[variable][] = site_frontpage
 features[variable][] = site_mail
 features[variable][] = site_name
 features[variable][] = site_slogan
+features[variable][] = smtp_allowhtml
 features[variable][] = smtp_from
 features[variable][] = smtp_fromname
 features[variable][] = smtp_host

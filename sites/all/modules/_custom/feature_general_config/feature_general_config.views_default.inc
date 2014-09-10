@@ -254,9 +254,14 @@ function feature_general_config_views_default_views() {
   $handler->display->display_options['fields']['field_field_product_photo']['alter']['path'] = 'node/[nid]';
   $handler->display->display_options['fields']['field_field_product_photo']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_field_product_photo']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['field_field_product_photo']['type'] = 'colorbox';
   $handler->display->display_options['fields']['field_field_product_photo']['settings'] = array(
-    'image_style' => 'product_image_small',
-    'image_link' => '',
+    'colorbox_node_style' => 'product_image_small',
+    'colorbox_image_style' => 'product_image_big',
+    'colorbox_gallery' => 'post',
+    'colorbox_gallery_custom' => '',
+    'colorbox_caption' => 'auto',
+    'colorbox_caption_custom' => '',
   );
   $handler->display->display_options['fields']['field_field_product_photo']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_field_product_photo']['delta_offset'] = '0';

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature Commerce config feature.
+ */
+
+include_once 'feature_commerce_config.features.inc';

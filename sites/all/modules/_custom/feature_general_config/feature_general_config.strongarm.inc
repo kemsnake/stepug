@@ -604,7 +604,7 @@ function feature_general_config_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'site_mail';
-  $strongarm->value = 'kemsnake@yandex.ru';
+  $strongarm->value = 'info@stepug.ru';
   $export['site_mail'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -624,6 +624,13 @@ function feature_general_config_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'smtp_allowhtml';
+  $strongarm->value = 1;
+  $export['smtp_allowhtml'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'smtp_from';
   $strongarm->value = 'info@stepug.ru';
   $export['smtp_from'] = $strongarm;
@@ -639,7 +646,7 @@ function feature_general_config_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'smtp_host';
-  $strongarm->value = 'smtp.gmail.com';
+  $strongarm->value = 'smtp.yandex.ru';
   $export['smtp_host'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -667,7 +674,7 @@ function feature_general_config_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'smtp_password';
-  $strongarm->value = 'brpitbntwqcdchwh';
+  $strongarm->value = 'zic5zs';
   $export['smtp_password'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -688,7 +695,7 @@ function feature_general_config_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'smtp_username';
-  $strongarm->value = 'kemsnake@gmail.com';
+  $strongarm->value = 'info@stepug.ru';
   $export['smtp_username'] = $strongarm;
 
   return $export;

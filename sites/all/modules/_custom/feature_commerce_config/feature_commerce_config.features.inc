@@ -14,6 +14,13 @@ function feature_commerce_config_ctools_plugin_api($module = NULL, $api = NULL) 
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function feature_commerce_config_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
+}
+
+/**
  * Implements hook_image_default_styles().
  */
 function feature_commerce_config_image_default_styles() {

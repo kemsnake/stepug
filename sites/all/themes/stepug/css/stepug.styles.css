@@ -126,9 +126,11 @@ img, media {
 #block-custom-stepug-stepug-user-links,
 #block-ajax-register-ajax-register-block {
     float:right;
+    width:100%;
+    text-align: right;
 }
 #block-custom-stepug-stepug-user-links .block__content{
-    margin: 1em;
+    margin: 1em 0 1em 1em;
 }
 .ajax-register-links-wrapper{
     overflow: hidden;

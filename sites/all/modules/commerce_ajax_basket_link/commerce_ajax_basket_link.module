@@ -47,7 +47,7 @@ function commerce_ajax_basket_link_static_output() {
   if ($qty > 0){
     $output = array(
       '#type' => 'markup',
-      '#markup' => '<p>' . l(t('View cart'), 'cart') . ' (' . $qty . ' ' . $price . ')</p>',
+      '#markup' => '<p>' . l(t('View cart'), 'cart') . ' (' . $qty . ' ' . $price . ')&nbsp;&nbsp;&nbsp;'. l(t('Checkout'), 'checkout') . '</p>',
     );
   }
   else {
@@ -109,10 +109,17 @@ function commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback($for
   // Get edit-submit ID
   $submit_id = $form['submit']['#id'];
 
-  // Basket items into top nav.
-  $output = commerce_ajax_basket_link_static_output();
-  $output['#markup'] = '<div class="content clearfix">' . $output['#markup'] . '</div>';
-  $commands[] = ajax_command_replace('#' . $submit_id, '<p>' . l(t('Item added to basket'), 'cart') . '</p>');
-  $commands[] = ajax_command_replace('#block-commerce-ajax-basket-link-commerce-ajax-basket-link .block__content', $output['#markup']);
+  $errors = drupal_get_messages('error');
+  if (count($errors['error']) == 0) {
+    // Basket items into top nav.
+    $output = commerce_ajax_basket_link_static_output();
+    $output['#markup'] = '<div class="content clearfix">' . $output['#markup'] . '</div>';
+    $commands[] = ajax_command_replace('#' . $submit_id, '<p>' . l(t('Item added to basket'), 'cart') . '</p>');
+    $commands[] = ajax_command_replace('#block-commerce-ajax-basket-link-commerce-ajax-basket-link .block__content', $output['#markup']);
+  }
+  else {
+    dsm($errors);
+    $commands[] = ajax_command_alert($errors['error'][0]);
+  }
   return array('#type' => 'ajax', '#commands' => $commands);
 }

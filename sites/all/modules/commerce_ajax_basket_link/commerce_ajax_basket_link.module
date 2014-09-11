@@ -118,7 +118,6 @@ function commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback($for
     $commands[] = ajax_command_replace('#block-commerce-ajax-basket-link-commerce-ajax-basket-link .block__content', $output['#markup']);
   }
   else {
-    dsm($errors);
     $commands[] = ajax_command_alert($errors['error'][0]);
   }
   return array('#type' => 'ajax', '#commands' => $commands);

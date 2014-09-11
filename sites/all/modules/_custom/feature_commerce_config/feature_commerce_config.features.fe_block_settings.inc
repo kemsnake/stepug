@@ -37,7 +37,7 @@ function feature_commerce_config_default_fe_block_settings() {
         'region' => 'header',
         'status' => 1,
         'theme' => 'stepug',
-        'weight' => -13,
+        'weight' => -14,
       ),
     ),
     'title' => '',

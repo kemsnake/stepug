@@ -12,6 +12,38 @@ function feature_general_config_default_fe_block_settings() {
 
   $export['version'] = '2.0';
 
+  $export['ajax_register-ajax_register_block'] = array(
+    'cache' => 8,
+    'custom' => 0,
+    'delta' => 'ajax_register_block',
+    'module' => 'ajax_register',
+    'node_types' => array(),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => 'header',
+        'status' => 1,
+        'theme' => 'stepug',
+        'weight' => -16,
+      ),
+    ),
+    'title' => '<none>',
+    'visibility' => 0,
+  );
+
   $export['block-footer_info'] = array(
     'cache' => -1,
     'custom' => 0,
@@ -69,7 +101,7 @@ function feature_general_config_default_fe_block_settings() {
         'region' => 'header',
         'status' => 1,
         'theme' => 'stepug',
-        'weight' => 0,
+        'weight' => -15,
       ),
     ),
     'title' => '',

@@ -35,9 +35,15 @@ function recently_read_views_api() {
  * Implements hook_entity_view().
  */
 function recently_read_entity_view($entity, $type, $view_mode, $langcode) {
-  $config = variable_get('rr_config', array());
+  $config = &drupal_static(__FUNCTION__);
+  if (!isset($config)) {
+    $config = variable_get('rr_config', array());
+  }
   //If the entity is not config for recently read track...
-  if (!$config[$type]['enable']) {
+  if (!isset($config[$type])) {
+    return;
+  }
+  if (isset($config[$type]) && !$config[$type]['enable']) {
     return;
   }
   //If the currently view mode is not support recently read track...
@@ -117,11 +123,6 @@ function recently_read_settings_validate($form, &$form_state) {
       form_set_error('rr_config][' . $key . '][max_record', t('%field must be a positive integer value.', array('%field' => $key)));
     }
   }
-}
-
-function recently_read_settings_submit($form, &$form_state) {
-  variable_set('rr_config', $form_state['values']['rr_config']);
-  drupal_set_message(t('The configuration options have been saved.'));
 }
 
 /**

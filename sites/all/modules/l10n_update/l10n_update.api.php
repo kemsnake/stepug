@@ -16,15 +16,18 @@
  *     ),
  *   );
  */
-function hook_l10n_servers() {
-  // This hook is used to specify the default localization server(s).
-  // Additionally server data can be specified on a per project basis in the
-  // .info file or using the hook_l10n_update_projects_alter().
-
-  module_load_include('inc', 'l10n_update');
-  $server = l10n_update_default_server();
-  return array($server['name'] => $server );
-}
+// @todo Mention in change record
+//    variable: l10n_update_default_filename
+//    variable: l10n_update_default_update_url
+//function hook_l10n_servers() {
+//  // This hook is used to specify the default localization server(s).
+//  // Additionally server data can be specified on a per project basis in the
+//  // .info file or using the hook_l10n_update_projects_alter().
+//
+//  module_load_include('inc', 'l10n_update');
+//  $server = l10n_update_default_server();
+//  return array($server['name'] => $server );
+//}
 
 /**
  * Alter the list of project to be updated by l10n update.
@@ -46,8 +49,9 @@ function hook_l10n_update_projects_alter(&$projects) {
   // the translation download path specified in the 10n_server.xml file.
   $projects['existing_example_project'] = array(
     'info' => array(
-      'l10n server' => 'example.com',
-      'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
+// @todo Mention in change record
+//      'l10n server' => 'example.com',
+//      'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
       'l10n path' => 'http://example.com/files/translations/%core/%project/%project-%release.%language.po',
     ),
   );
@@ -62,8 +66,8 @@ function hook_l10n_update_projects_alter(&$projects) {
     'info' => array(
       'version' => '6.x-1.5',
       'core' => '6.x',
-      'l10n server' => 'example.com',
-      'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
+//      'l10n server' => 'example.com',
+//      'l10n url' => 'http://example.com/files/translations/l10n_server.xml',
       'l10n path' => 'http://example.com/files/translations/%core/%project/%project-%release.%language.po',
     ),
   );

@@ -16,7 +16,7 @@ function colorbox_requirements($phase) {
     $library = libraries_detect('colorbox');
     $error_type = isset($library['error']) ? drupal_ucfirst($library['error']) : '';
     $error_message = isset($library['error message']) ? $library['error message'] : '';
-dsm($library);
+
     if (empty($library['installed'])) {
       $requirements['colorbox_plugin'] = array(
         'title' => $t('Colorbox plugin'),

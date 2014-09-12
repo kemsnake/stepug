@@ -69,7 +69,7 @@ function feature_commerce_config_views_default_views() {
     'colorbox_node_style' => 'product_image_small',
     'colorbox_node_style_first' => '',
     'colorbox_image_style' => 'product_image_big',
-    'colorbox_gallery' => 'post',
+    'colorbox_gallery' => 'none',
     'colorbox_gallery_custom' => '',
     'colorbox_caption' => 'auto',
     'colorbox_caption_custom' => '',

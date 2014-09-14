@@ -1,0 +1,33 @@
+Index: sites/all/modules/taxonomy_menu/taxonomy_menu.module
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sites/all/modules/taxonomy_menu/taxonomy_menu.module	(revision 0a893fcd9ae1205031c503ff308ffd7204ffa722)
++++ sites/all/modules/taxonomy_menu/taxonomy_menu.module	(revision )
+@@ -923,9 +923,10 @@
+     // if display number is selected and $num > 0 then change the title
+     if (variable_get(_taxonomy_menu_build_variable('display_num', $item['vid']), FALSE)) {
+       // if number > 0 and display decendants, then count all of the children
+-      if (variable_get(_taxonomy_menu_build_variable('display_descendants', $item['vid']), FALSE)) {
++      // todo show summury for parents level
++      //if (variable_get(_taxonomy_menu_build_variable('display_descendants', $item['vid']), FALSE)) {
+         $num = taxonomy_menu_term_count_nodes($item['tid'], $item['vid']);
+-      }
++      //}
+       $item['name'] .= " ($num)";
+     }
+   }
+@@ -1166,9 +1167,10 @@
+             // if display number is selected and $num > 0 then change the title
+             elseif (variable_get(_taxonomy_menu_build_variable('display_num', $t->vid), FALSE)) {
+               // if number > 0 and display decendants, then count all of the children
+-              if (variable_get(_taxonomy_menu_build_variable('display_descendants', $t->vid), FALSE)) {
++              // todo ahow summury for parents level
++              //if (variable_get(_taxonomy_menu_build_variable('display_descendants', $t->vid), FALSE)) {
+                 $num = taxonomy_menu_term_count_nodes($t->tid, $t->vid);
+-              }
++              //}
+               $display_num = " ($num)";
+             }
+ 

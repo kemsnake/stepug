@@ -1,92 +1,76 @@
 <?php
 
-/**
- * @file
- * Database functions.
- */
 
 /**
- * Inserts a taxonomy term/menu item association in {taxonomy_menu} table.
+ * @file
+ * Database functions
+ */
+
+ /**
+ *  helper function to insert a menu item
  *
  * @param $mlid
- *   the menu link's ID.
  * @param $tid
- *   the term's ID.
  * @param $vid
- *   the vocabulary's ID.
- * @param $langcode
- *   (optional) Defaults to LANGUAGE_NONE.
- *   The language code associated to the menu link's ID.
  */
-function _taxonomy_menu_insert_menu_item($mlid, $tid, $vid, $langcode = LANGUAGE_NONE) {
+function _taxonomy_menu_insert_menu_item($mlid, $tid, $vid) {
   $fields = array(
     'mlid' => $mlid,
     'tid' => $tid,
     'vid' => $vid,
-    'language' => $langcode,
   );
-
-  db_insert('taxonomy_menu')
-    ->fields($fields)
-    ->execute();
+  db_insert('taxonomy_menu')->fields($fields)->execute();
 }
 
-
 /**
- * Returns an mlid based on a taxonomy term ID and vocabulary ID.
+ * Return the corresponding menu link id.
  *
  * @param $tid
- *   the term's ID.
- * @param $vid
- *   the vocabulary's ID.
- * @param $langcode
- *   (optional) Defaults to LANGUAGE_NONE.
- *   The language code associated to the menu link's ID.
- *
- * @return
- *   the menu link ID associated to the $tid and $vid. If not found, returns
- *   FALSE.
+ *   the term's id
  */
-function _taxonomy_menu_get_mlid($tid, $vid, $langcode = LANGUAGE_NONE) {
-  $query = db_select('taxonomy_menu', 'tm')
-    ->fields('tm', array('mlid'))
-    ->condition('tid', $tid)
-    ->condition('vid', $vid)
-    ->condition('language', $langcode);
-  $result = $query->execute()->fetchField();
-
-  return $result;
+function _taxonomy_menu_get_mlid($tid, $vid) {
+  $where = array(
+    ':tid' => $tid,
+    ':vid' => $vid,
+  );
+  return db_query('SELECT mlid FROM {taxonomy_menu} WHERE tid = :tid AND vid = :vid', $where)->fetchField();
 }
 
 /**
- * Retrieves all menu items for a vocabulary.
+ * Retrieve the term / menu relations for a vocab.
  *
  * @param $vid
- *   the vocabulary's ID.
- *
- * @return array
- *   An associative array of menu link id / taxonomy term id associations.
+ *   vocabulary's id
+ * @return
+ *   array(tid => mlid)
  */
 function _taxonomy_menu_get_menu_items($vid) {
-  $result = db_select('taxonomy_menu', 'tm')
-  ->fields('tm', array('mlid', 'tid'))
-  ->condition('vid', $vid)
-  ->execute()
-  ->fetchAllKeyed();
 
-  return $result;
+  $result = db_query('SELECT tid, mlid FROM {taxonomy_menu} WHERE vid = :vid', array(':vid' => $vid));
+  $menu_items = array();
+  $menu_items = $result->fetchAllKeyed();
+  return $menu_items;
 }
 
-/**
- * Deletes all links associated with this vocab from {taxonomy_menu} table.
- *
- * @param $vid
- *   the vocabulary's id to delete items from.
- */
+ /**
+  * Delete all links associated with this vocab from both the taxonomy_menu
+  * table and the menu_link table.
+  *
+  * @param $vid
+  *   vocabulary's id
+  */
 function _taxonomy_menu_delete_all($vid) {
-  db_delete('taxonomy_menu')
-    ->condition('vid', $vid)
-    ->execute();
+  $menu_terms = _taxonomy_menu_get_menu_items($vid);
+  if (!empty($menu_terms)) {
+    foreach ($menu_terms as $tid => $mlid) {
+      db_delete('menu_links')
+        ->condition('mlid', $mlid)
+        ->execute();
+    }
+    db_delete('taxonomy_menu')
+      ->condition('vid', $vid)
+      ->execute();
+  }
 }
 
 /**
@@ -134,37 +118,28 @@ function _taxonomy_menu_get_parents($tid) {
 }
 
 /**
-  * Delete all rows from {taxomony_menu} associated with this term ID and
-  * vocabulary ID.
+  * Delete all rows from {taxomony_menu} associated with this tid
   *
   * @param $vid
-  *   The vocabulary ID.
   * @param $tid
-  *   The term ID.
   */
 function _taxonomy_menu_delete_item($vid, $tid) {
-  db_delete('taxonomy_menu')
-    ->condition('vid', $vid)
-    ->condition('tid', $tid)
-    ->execute();
+  $and = db_and()->condition('vid', $vid)->condition('tid', $tid);
+  db_delete('taxonomy_menu')->condition($and)->execute();
 }
 
 /**
- * Get all of the tid for a given vocabulary id.
- * Used to build path (tid1+tid2+...)
+ * Get all of the tid for a given vid
  *
  * @param $vid
- *   The vocabulary id.
- *
- * @return
- *   A list of terms id for this vocabulary.
+ * @return array of $tid
  */
-function _taxonomy_menu_get_tids($vid) {
+function _taxonomy_menu_get_terms($vid) {
   $result = db_select('taxonomy_term_data', 'td')
-  ->condition('vid', $vid)
-  ->fields('td', array('tid'))
-  ->execute();
-  return $result->fetchCol();
+    ->condition('vid', $vid)
+    ->fields('td', array('tid'))
+    ->execute();
+  return $result->fetchAll();
 }
 
 /**
@@ -227,3 +202,7 @@ function _taxonomy_menu_get_vid_by_tid($tids) {
     return $result->fetchAllAssoc('vid');
   }
 }
+
+/**
+ * Options functions
+ */

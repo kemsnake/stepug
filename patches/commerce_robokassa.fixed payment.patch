@@ -1,0 +1,61 @@
+diff --git a/commerce_robokassa.module b/commerce_robokassa.module
+index a658f30..063afa2 100644
+--- a/commerce_robokassa.module
++++ b/commerce_robokassa.module
+@@ -228,20 +228,27 @@ function commerce_robokassa_result() {
+       $currency_code = $wrapper->commerce_order_total->currency_code->value();
+       $amount = $wrapper->commerce_order_total->amount->value();
+       // Get real price.
+-      $amount = commerce_currency_amount_to_decimal($amount, $currency_code);
++      $amount_real = commerce_currency_amount_to_decimal($amount, $currency_code);
+ 
++      // @todo do we really need this?
+       $amount_received = abs($amount_in);
+-      $amount_stored = abs($amount);
++      $amount_stored = abs($amount_real);
+ 
+       if ($amount_received == $amount_stored) {
+-        commerce_robokassa_create_transaction($order_in, commerce_robokassa_get_settings('status'));
++        $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
++        $charge = array(
++          'amount' => $amount,
++          'currency_code' => $currency_code,
++        );
++
++        commerce_robokassa_create_transaction($payment_method, $order, $charge);
+         watchdog('commerce_robokassa', 'Order #@order paid successfully.', array('@order' => $order_in), WATCHDOG_INFO);
+       }
+       else {
+         watchdog('commerce_robokassa', 'Order #@order was not paid: recieved (@am_rec) and real(@am_int) order info do not match.', array(
+           '@order' => $order_in,
+           '@am_rec' => $amount_in,
+-          '@am_int' => $amount,
++          '@am_int' => $amount_real,
+           ), WATCHDOG_ERROR);
+       }
+     }
+@@ -267,20 +274,13 @@ function commerce_robokassa_result() {
+  * @param $name
+  *   The name entered on the submission form.
+  */
+-function commerce_robokassa_create_transaction($order_id, $status) {
+-  $order = commerce_order_load($order_id);
+-  $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+-
++function commerce_robokassa_create_transaction($payment_method, $order, $charge) {
+   $transaction = commerce_payment_transaction_new('commerce_robokassa', $order->order_id);
+   $transaction->instance_id = $payment_method['instance_id'];
+ 
+-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+-
+-  $currency_code = $wrapper->commerce_order_total->currency_code->value();
+-  $amount = $wrapper->commerce_order_total->amount->value();
+-
+-  //$transaction->amount = $order->commerce_order_total[LANGUAGE_NONE][0]['amount'];
+-  //$transaction->currency_code = $order->commerce_order_total[LANGUAGE_NONE][0]['currency_code'];
++  // Store payment details in transaction.
++  $transaction->amount = $charge['amount'];
++  $transaction->currency_code = $charge['currency_code'];
+ 
+   // @doto Sheck statuses deeper
+   $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;

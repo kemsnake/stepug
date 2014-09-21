@@ -1,0 +1,41 @@
+Index: sites/all/modules/ajax_register/ajax_register.module
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sites/all/modules/ajax_register/ajax_register.module	(revision 8e5713e63f7cd99e5aaa3608796db41ee33dd36b)
++++ sites/all/modules/ajax_register/ajax_register.module	(revision )
+@@ -75,7 +75,7 @@
+     '#type' => 'checkboxes',
+     '#title' => t('Enabled links'),
+     '#options' => array(
+-      'login' => t('Login'),
++      'login' => t('Log in'),
+       'register' => t('Create new account'),
+       'password' => t('Request new password'),
+     ),
+@@ -395,7 +395,7 @@
+ 
+   // Add login button.
+   if (in_array('login', $links_enabled) && (stripos($form_id, 'user_login') === FALSE)) {
+-    $options['attributes']['title'] = t('Login');
++    $options['attributes']['title'] = t('Log in');
+     $links[] = l(t('Login'), 'ajax_register/login/nojs', $options);
+   }
+ 
+Index: sites/all/modules/ajax_register/ajax_register.pages.inc
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sites/all/modules/ajax_register/ajax_register.pages.inc	(revision 8e5713e63f7cd99e5aaa3608796db41ee33dd36b)
++++ sites/all/modules/ajax_register/ajax_register.pages.inc	(revision )
+@@ -38,7 +38,7 @@
+     }
+     elseif ($form_type == 'login') {
+       // Show USER LOGIN form.
+-      $form_state['title'] = t('Login');
++      $form_state['title'] = t('Log in');
+       $commands = ctools_modal_form_wrapper('user_login', $form_state);
+     }
+ 

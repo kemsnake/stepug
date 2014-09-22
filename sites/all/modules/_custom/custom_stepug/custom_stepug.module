@@ -31,7 +31,7 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   //Прячем кнопку поиска и делаем плэйсхолдер для поля поиска
   if ($form_id == 'views_exposed_form' && $form['#id'] == 'views-exposed-form-popular-products-page-3') {
     $form['title']['#attributes']['placeholder'] = t('Search');
-    $form['title']['#size'] = 30;
+    $form['title']['#size'] = 25;
   }
 
   // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара

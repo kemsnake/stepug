@@ -15,6 +15,8 @@ function feature_commerce_config_user_default_permissions() {
     'name' => 'access checkout',
     'roles' => array(
       'administrator' => 'administrator',
+      'anonymous user' => 'anonymous user',
+      'authenticated user' => 'authenticated user',
       'менеджер магазина' => 'менеджер магазина',
     ),
     'module' => 'commerce_checkout',

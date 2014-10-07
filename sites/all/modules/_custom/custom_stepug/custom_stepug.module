@@ -21,6 +21,56 @@ function custom_stepug_library() {
   return $libraries;
 }
 
+/**
+ * Implements hook_menu().
+ */
+function custom_stepug_menu() {
+
+  $items['robokassa/order/success'] = array(
+    'title' => 'Successful payment',
+    'page callback' => 'custom_stepug_robokassa_success',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['robokassa/order/fail'] = array(
+    'title' => 'Unsuccessful payment',
+    'page callback' => 'custom_stepug_robokassa_fail',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Success page callback handler.
+ */
+function custom_stepug_robokassa_success() {
+  $build = array();
+  if (isset($_POST['InvId']) && isset($_POST['OutSum']) && isset($_POST['SignatureValue'])) {
+    $message = t('Thank you, payment successful. Order #@shop_order,<br />', array('@shop_order' => $_POST['InvId']));
+    drupal_set_message($message, 'status');
+    global $user;
+    if ($user->uid > 0) {
+      drupal_goto('user/' . $user->uid . '/orders');
+    }
+    else {
+      drupal_goto('');
+    }
+  }
+  else {
+    $build = MENU_ACCESS_DENIED;
+  }
+  return $build;
+}
+
+/**
+ * Fail page callback handler.
+ */
+function custom_stepug_robokassa_fail() {
+  drupal_set_message(t('Payment unsuccessful!'), 'error');
+  drupal_goto('');
+}
+
 function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
     $form['#attached']['library'][] = array('custom_stepug', 'jquery_ui_spinner');

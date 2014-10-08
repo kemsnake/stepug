@@ -50,7 +50,7 @@ function l10n_update_test_l10n_update_projects_alter(&$projects) {
         'name' => 'contrib_module_one',
         'info' => array (
           'name' => 'Contributed module one',
-          'l10n path' => $remote_url . '%core/%project/%project-%version.%language._po',
+          'l10n path' => $remote_url . '%core/%project/%project-%release.%language._po',
           'package' => 'Other',
           'version' => '7.x-1.1',
           'project' => 'contrib_module_one',
@@ -68,7 +68,7 @@ function l10n_update_test_l10n_update_projects_alter(&$projects) {
         'name' => 'contrib_module_two',
         'info' => array (
           'name' => 'Contributed module two',
-          'l10n path' => $remote_url . '%core/%project/%project-%version.%language._po',
+          'l10n path' => $remote_url . '%core/%project/%project-%release.%language._po',
           'package' => 'Other',
           'version' => '7.x-2.0-beta4',
           'project' => 'contrib_module_two',
@@ -86,7 +86,7 @@ function l10n_update_test_l10n_update_projects_alter(&$projects) {
         'name' => 'contrib_module_three',
         'info' => array (
           'name' => 'Contributed module three',
-          'l10n path' => $remote_url . '%core/%project/%project-%version.%language._po',
+          'l10n path' => $remote_url . '%core/%project/%project-%release.%language._po',
           'package' => 'Other',
           'version' => '7.x-1.0',
           'project' => 'contrib_module_three',

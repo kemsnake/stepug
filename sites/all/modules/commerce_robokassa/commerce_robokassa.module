@@ -65,7 +65,7 @@ function commerce_robokassa_commerce_payment_method_info() {
 function commerce_robokassa_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
   $build = array();
   $text = theme('image', array(
-    'path' => drupal_get_path('module', 'commerce_robokassa') . '/logo.gif',
+    'path' => drupal_get_path('module', 'commerce_robokassa') . '/big_logo.png',
     'alt' => t('Robokassa'),
     'title' => t('Robokassa'),
     'attributes' => array('class' => 'logo-robokassa'),

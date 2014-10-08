@@ -13,7 +13,7 @@
  * themes which have set a "server pattern" to use a remote translation server
  * will be ignored.
  */
-const L10N_UPDATE_USE_SOURCE_LOCAL = 2;
+define('L10N_UPDATE_USE_SOURCE_LOCAL', 2);
 
 /**
  * Translation update mode: Use both remote and local files.
@@ -21,50 +21,50 @@ const L10N_UPDATE_USE_SOURCE_LOCAL = 2;
  * When checking for available translation updates, both local and remote files
  * will be checked.
  */
-const L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL = 3;
+define('L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL', 3);
 
 /**
  * Default location of gettext file on the translation server.
  *
  * @see l10n_update_default_translation_server().
  */
-const L10N_UPDATE_DEFAULT_SERVER_PATTERN = 'http://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
+define('L10N_UPDATE_DEFAULT_SERVER_PATTERN', 'http://ftp.drupal.org/files/translations/%core/%project/%project-%release.%language.po');
 
 /**
  * Default gettext file name on the translation server.
  */
-const L10N_UPDATE_DEFAULT_FILE_NAME = '%project-%version.%language.po';
+define('L10N_UPDATE_DEFAULT_FILE_NAME', '%project-%release.%language.po');
 
 /**
  * Default gettext file name on the translation server.
  */
-const L10N_UPDATE_DEFAULT_TRANSLATION_PATH = 'sites/all/translations';
+define('L10N_UPDATE_DEFAULT_TRANSLATION_PATH', 'sites/all/translations');
 
 /**
  * The number of seconds that the translations status entry should be considered.
  */
-const L10N_UPDATE_STATUS_TTL = 600;
+define('L10N_UPDATE_STATUS_TTL', 600);
 
 /**
  * UI option for override of existing translations. Only override non-customized
  * translations.
  */
-const L10N_UPDATE_OVERWRITE_NON_CUSTOMIZED = 2;
+define('L10N_UPDATE_OVERWRITE_NON_CUSTOMIZED', 2);
 
 /**
  * Translation source is a remote file.
  */
-const L10N_UPDATE_REMOTE = 'remote';
+define('L10N_UPDATE_REMOTE', 'remote');
 
 /**
  * Translation source is a local file.
  */
-const L10N_UPDATE_LOCAL = 'local';
+define('L10N_UPDATE_LOCAL', 'local');
 
 /**
  * Translation source is the current translation.
  */
-const L10N_UPDATE_CURRENT = 'current';
+define('L10N_UPDATE_CURRENT', 'current');
 
 /**
  * The delimiter used to split plural strings.
@@ -73,7 +73,7 @@ const L10N_UPDATE_CURRENT = 'current';
  * separate singular and plural variants in source and translation text. It
  * was found to be the most compatible delimiter for the supported databases.
  */
-const L10N_UPDATE_PLURAL_DELIMITER = "\03";
+define('L10N_UPDATE_PLURAL_DELIMITER', "\03");
 
 /**
  * Flag for locally not customized interface translation.
@@ -81,7 +81,7 @@ const L10N_UPDATE_PLURAL_DELIMITER = "\03";
  * Such translations are imported from .po files downloaded from
  * localize.drupal.org for example.
  */
-const L10N_UPDATE_NOT_CUSTOMIZED = 0;
+define('L10N_UPDATE_NOT_CUSTOMIZED', 0);
 
 /**
  * Flag for locally customized interface translation.
@@ -90,7 +90,7 @@ const L10N_UPDATE_NOT_CUSTOMIZED = 0;
  * string translation form. Strings can also be marked as customized when a po
  * file is imported.
  */
-const L10N_UPDATE_STRING_CUSTOM = 1;
+define('L10N_UPDATE_STRING_CUSTOM', 1);
 
 /**
  * Flag for locally customized interface translation.
@@ -98,7 +98,7 @@ const L10N_UPDATE_STRING_CUSTOM = 1;
  * Such translations are edited from their imported originals on the user
  * interface or are imported as customized.
  */
-const L10N_UPDATE_CUSTOMIZED = 1;
+define('L10N_UPDATE_CUSTOMIZED', 1);
 
 /**
  * Implements hook_help().

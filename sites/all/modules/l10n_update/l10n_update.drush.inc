@@ -16,13 +16,13 @@ function l10n_update_drush_command() {
   $commands['l10n-update-status'] = array(
     'description' => 'Show translation status of available projects.',
     'options' => array(
-      'languages' => 'Comma separated list of languages. Defaults to all available languages. Example: --langauges="nl, fr, de"',
+      'languages' => 'Comma separated list of languages. Defaults to all available languages. Example: --languages="nl, fr, de"',
     )
   );
   $commands['l10n-update'] = array(
     'description' => 'Update translations.',
     'options' => array(
-      'languages' => 'Comma separated list of languages. Defaults to all available languages. Example: --langauges="nl, fr, de"',
+      'languages' => 'Comma separated list of languages. Defaults to all available languages. Example: --languages="nl, fr, de"',
       'mode' => 'Determine if existing translations are overwitten during import. Use "overwrite" to overwrite any existing translation, "replace" to replace previously imported translations but not overwrite edited strings, "keep" to keep any existing translation and only add new translations. Default value: "keep"'
     ),
   );

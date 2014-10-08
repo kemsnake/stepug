@@ -308,7 +308,10 @@ function l10n_update_update_7200() {
     registry_rebuild();
   }
 
-  $path = variable_get('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH);
+  if (!variable_get('l10n_update_download_store', '')) {
+    variable_set('l10n_update_download_store', 'sites/all/translations');
+  }
+  $path = variable_get('l10n_update_download_store', 'sites/all/translations');
   if (!file_prepare_directory($path, FILE_CREATE_DIRECTORY & FILE_MODIFY_PERMISSIONS)) {
     watchdog('l10n_update', 'The directory %directory does not exist or is not writable.', array('%directory' => $path), WATCHDOG_ERROR);
     drupal_set_message(t('The directory %directory does not exist or is not writable.', array('%directory' => $path)), 'error');
@@ -316,9 +319,9 @@ function l10n_update_update_7200() {
 
   // Translation source 'Remote server only' is no longer supported. Use 'Remote
   // and local' instead.
-  $mode = variable_get('l10n_update_check_mode', L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL);
+  $mode = variable_get('l10n_update_check_mode', 3); // L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL
   if ($mode == 1) {
-    variable_set('l10n_update_check_mode', L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL);
+    variable_set('l10n_update_check_mode', 3); // L10N_UPDATE_USE_SOURCE_REMOTE_AND_LOCAL
   }
 
   // Daily cron updates are no longer supported. Use weekly instead.
@@ -337,7 +340,7 @@ function l10n_update_update_7200() {
  * Sets the default translation files directory.
  */
 function l10n_update_update_7201() {
-  if (!variable_get('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH)) {
-   variable_set('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH);
+  if (!variable_get('l10n_update_download_store', '')) {
+   variable_set('l10n_update_download_store', 'sites/all/translations');
   }
 }

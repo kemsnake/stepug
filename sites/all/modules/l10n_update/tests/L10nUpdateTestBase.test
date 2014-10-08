@@ -158,7 +158,7 @@ EOF;
     // Setup the environment.
     $public_path = drupal_realpath('public://');
     $this->setTranslationsDirectory($public_path . '/local');
-    variable_set('l10n_update_default_filename', '%project-%version.%language._po');
+    variable_set('l10n_update_default_filename', '%project-%release.%language._po');
 
     // Setting up sets of translations for the translation files.
     $translations_one = array('January' => 'Januar_1', 'February' => 'Februar_1', 'March' => 'Marz_1');

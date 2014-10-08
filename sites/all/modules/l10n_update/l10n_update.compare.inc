@@ -83,6 +83,13 @@ function l10n_update_build_projects($refresh = FALSE) {
 
         unset($release);
       }
+      // Without Update module we do a best effort fallback. A development
+      // release will fall back to the corresponding release version.
+      elseif (!isset($projects_info) && isset($data['info']['version'])) {
+        if (preg_match('/[^x](\+\d+)?-dev$/', $data['info']['version'])) {
+          $data['info']['version'] = preg_replace('/(\+\d+)?-dev$/', '', $data['info']['version']);
+        }
+      }
 
       $data += array(
         'version' => isset($data['info']['version']) ? $data['info']['version'] : '',

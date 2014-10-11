@@ -42,6 +42,14 @@ function custom_stepug_menu() {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function custom_stepug_menu_alter($items) {
+  $items['user/%user/ulogin']['access arguments'] = array('administer users');
+  $items['user/%user/ulogin/delete']['access arguments'] = array('administer users');
+}
+
+/**
  * Success page callback handler.
  */
 function custom_stepug_robokassa_success() {
@@ -72,6 +80,7 @@ function custom_stepug_robokassa_fail() {
 }
 
 function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
+  dsm($form_id);
   if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
     $form['#attached']['library'][] = array('custom_stepug', 'jquery_ui_spinner');
     $form['quantity']['#title'] = '';
@@ -87,6 +96,27 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара
   if ($form_id == 'search_form') {
     $form['#access'] = FALSE;
+  }
+
+  // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара
+  if ($form_id == 'user_register_form' || ($form_id == 'user_profile_form' && $form['#user_category'] == 'account')) {
+    // скрываем языковые настройки от обычных пользователей
+    if (!user_access('administer users')) {
+      $form['locale']['#access'] = FALSE;
+    }
+    dsm($form);
+  }
+}
+
+/**
+ * Implement hook_module_implements_alter().
+ */
+function custom_stepug_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'form_alter') {
+    // выполняем нащ хук в самом конце
+    $group = $implementations['custom_stepug'];
+    unset($implementations['custom_stepug']);
+    $implementations['custom_stepug'] = $group;
   }
 }
 

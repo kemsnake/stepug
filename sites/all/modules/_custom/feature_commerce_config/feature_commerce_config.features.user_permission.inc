@@ -201,6 +201,13 @@ function feature_commerce_config_user_default_permissions() {
     'module' => 'file_entity',
   );
 
+  // Exported permission: 'clear commecrce_product_importer feeds'.
+  $permissions['clear commecrce_product_importer feeds'] = array(
+    'name' => 'clear commecrce_product_importer feeds',
+    'roles' => array(),
+    'module' => 'feeds',
+  );
+
   // Exported permission: 'configure auto product display'.
   $permissions['configure auto product display'] = array(
     'name' => 'configure auto product display',
@@ -628,14 +635,11 @@ function feature_commerce_config_user_default_permissions() {
     'module' => 'file_entity',
   );
 
-  // Exported permission: 'import media'.
-  $permissions['import media'] = array(
-    'name' => 'import media',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'менеджер магазина' => 'менеджер магазина',
-    ),
-    'module' => 'media',
+  // Exported permission: 'import commecrce_product_importer feeds'.
+  $permissions['import commecrce_product_importer feeds'] = array(
+    'name' => 'import commecrce_product_importer feeds',
+    'roles' => array(),
+    'module' => 'feeds',
   );
 
   // Exported permission: 'make rule based changes to commerce_stock'.
@@ -664,6 +668,13 @@ function feature_commerce_config_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'i18n_string',
+  );
+
+  // Exported permission: 'unlock commecrce_product_importer feeds'.
+  $permissions['unlock commecrce_product_importer feeds'] = array(
+    'name' => 'unlock commecrce_product_importer feeds',
+    'roles' => array(),
+    'module' => 'feeds',
   );
 
   // Exported permission: 'update payments'.

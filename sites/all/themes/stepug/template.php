@@ -93,7 +93,7 @@ function stepug_price_formatted_components(&$variables) {
  * Добавлеяем пункт "показать все" в пэйджер товаров
  */
 function stepug_process_item_list(&$variables){
-  if ($variables['attributes']['class'][0] == 'pager') {
+  if (isset($variables['attributes']['class'][0]) && $variables['attributes']['class'][0] == 'pager') {
     $display_all_item['class'][] = 'pager__item';
     $display_all_item['class'][] = 'pager-display-all';
     $display_all_item['data'] = l(t('показать все'), 'taxonomy/term/' . arg(2) . '/all');

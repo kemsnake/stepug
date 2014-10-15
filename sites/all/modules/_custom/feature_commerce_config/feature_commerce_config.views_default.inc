@@ -69,7 +69,7 @@ function feature_commerce_config_views_default_views() {
     'colorbox_node_style' => 'product_image_small',
     'colorbox_node_style_first' => '',
     'colorbox_image_style' => 'product_image_big',
-    'colorbox_gallery' => 'none',
+    'colorbox_gallery' => 'post',
     'colorbox_gallery_custom' => '',
     'colorbox_caption' => 'auto',
     'colorbox_caption_custom' => '',
@@ -99,6 +99,7 @@ function feature_commerce_config_views_default_views() {
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
+  $handler->display->display_options['defaults']['metatags'] = FALSE;
   $translatables['recently_viewed_product'] = array(
     t('Master'),
     t('Недавно просмотренные'),

@@ -1,0 +1,4 @@
+name = Commerce order receipt
+description = Print order receipt
+dependencies[] = phpexcel
+core = 7.x

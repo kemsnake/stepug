@@ -177,3 +177,29 @@ function custom_stepug_node_view($node, $view_mode, $langcode) {
 function custom_stepug_commerce_checkout_page_info_alter(&$checkout_pages) {
   $checkout_pages['payment']['help'] = '<div class="checkout-help">' . t('Please wait. You will now be redirected to the payment server. If you are not redirected within 10 seconds, please click on the button below.') . '</div>';
 }
+
+/**
+ * Invoked after a feed item has been saved.
+ *
+ * @param FeedsSource $source
+ *  FeedsSource object that describes the source that is being imported.
+ * @param $entity
+ *   The entity object that has just been saved.
+ * @param array $item
+ *   The parser result for this entity.
+ * @param int|null $entity_id
+ *  The id of the current item which is going to be updated. If this is a new
+ *  item, then NULL is passed.
+ */
+function custom_stepug_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
+  global $user;
+  // Product display
+  $node = (object)array('type' => 'product_display');
+  node_object_prepare($node);
+  $node->title = $entity->title;
+  $node->uid = $user->uid;
+  $node->status = 0;
+  $node->field_product[LANGUAGE_NONE][]['product_id'] = $entity->product_id;
+  $node->language = LANGUAGE_NONE;
+  node_save($node);
+}

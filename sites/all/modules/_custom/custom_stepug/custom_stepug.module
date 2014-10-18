@@ -163,7 +163,7 @@ function custom_stepug_ctools_plugin_directory($module, $plugin) {
  */
 function custom_stepug_node_view($node, $view_mode, $langcode) {
   if ($node->type == 'product_display') {
-    if (isset($node->field_product['und'][0]['product_id']) && user_access('edit any commerce product entity')) {
+    if (isset($node->field_product['und'][0]['product_id']) && user_access('edit any commerce_product entity')) {
       $product_id = $node->field_product['und'][0]['product_id'];
       $node->content['field_product'][0]['edit_link'] = array(
         '#markup' => l(t('Edit product'), 'admin/commerce/products/' . $product_id . '/edit'),

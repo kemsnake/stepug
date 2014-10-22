@@ -141,7 +141,9 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'administer media browser'.
   $permissions['administer media browser'] = array(
     'name' => 'administer media browser',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+    ),
     'module' => 'media',
   );
 
@@ -204,7 +206,10 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'clear commecrce_product_importer feeds'.
   $permissions['clear commecrce_product_importer feeds'] = array(
     'name' => 'clear commecrce_product_importer feeds',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'менеджер магазина' => 'менеджер магазина',
+    ),
     'module' => 'feeds',
   );
 
@@ -638,7 +643,10 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'import commecrce_product_importer feeds'.
   $permissions['import commecrce_product_importer feeds'] = array(
     'name' => 'import commecrce_product_importer feeds',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'менеджер магазина' => 'менеджер магазина',
+    ),
     'module' => 'feeds',
   );
 
@@ -673,7 +681,10 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'unlock commecrce_product_importer feeds'.
   $permissions['unlock commecrce_product_importer feeds'] = array(
     'name' => 'unlock commecrce_product_importer feeds',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'менеджер магазина' => 'менеджер магазина',
+    ),
     'module' => 'feeds',
   );
 

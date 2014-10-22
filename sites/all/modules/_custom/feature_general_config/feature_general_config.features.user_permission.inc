@@ -49,6 +49,15 @@ function feature_general_config_user_default_permissions() {
     'module' => 'yandex_metrics',
   );
 
+  // Exported permission: 'administer custom breadcrumbs'.
+  $permissions['administer custom breadcrumbs'] = array(
+    'name' => 'administer custom breadcrumbs',
+    'roles' => array(
+      'administrator' => 'administrator',
+    ),
+    'module' => 'custom_breadcrumbs',
+  );
+
   // Exported permission: 'delete all webform submissions'.
   $permissions['delete all webform submissions'] = array(
     'name' => 'delete all webform submissions',
@@ -87,6 +96,15 @@ function feature_general_config_user_default_permissions() {
       'менеджер магазина' => 'менеджер магазина',
     ),
     'module' => 'webform',
+  );
+
+  // Exported permission: 'use php in custom breadcrumbs'.
+  $permissions['use php in custom breadcrumbs'] = array(
+    'name' => 'use php in custom breadcrumbs',
+    'roles' => array(
+      'administrator' => 'administrator',
+    ),
+    'module' => 'custom_breadcrumbs',
   );
 
   return $permissions;

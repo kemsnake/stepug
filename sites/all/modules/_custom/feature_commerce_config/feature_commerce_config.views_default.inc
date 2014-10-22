@@ -424,14 +424,6 @@ function feature_commerce_config_views_default_views() {
   $handler->display->display_options['relationships']['field_product_product_id']['table'] = 'field_data_field_product';
   $handler->display->display_options['relationships']['field_product_product_id']['field'] = 'field_product_product_id';
   $handler->display->display_options['relationships']['field_product_product_id']['required'] = TRUE;
-  /* Поле: Содержимое: Заголовок */
-  $handler->display->display_options['fields']['title']['id'] = 'title';
-  $handler->display->display_options['fields']['title']['table'] = 'node';
-  $handler->display->display_options['fields']['title']['field'] = 'title';
-  $handler->display->display_options['fields']['title']['label'] = '';
-  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
-  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
-  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   /* Поле: Commerce Товар: Фото */
   $handler->display->display_options['fields']['field_field_product_photo']['id'] = 'field_field_product_photo';
   $handler->display->display_options['fields']['field_field_product_photo']['table'] = 'field_data_field_field_product_photo';
@@ -452,6 +444,14 @@ function feature_commerce_config_views_default_views() {
   );
   $handler->display->display_options['fields']['field_field_product_photo']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_field_product_photo']['delta_offset'] = '0';
+  /* Поле: Содержимое: Заголовок */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   /* Sort criterion: Recently Read: Recently Read Date */
   $handler->display->display_options['sorts']['timestamp']['id'] = 'timestamp';
   $handler->display->display_options['sorts']['timestamp']['table'] = 'recently_read';

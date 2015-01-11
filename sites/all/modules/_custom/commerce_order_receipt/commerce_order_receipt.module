@@ -20,44 +20,102 @@ function commerce_order_receipt_menu() {
 function commerce_order_receipt_print_order($order) {
   module_load_include('inc', 'phpexcel');
   $headers = array();
-  $data[] = array('Товарный чек №' . $order->order_id . ' от ' . format_date($order->created, 'short'));
+  $data[] = array('Товарный чек №' . $order->order_id . ' от ' . format_date($order->created, 'custom', 'd.m.Y'));
+  $data[] = array();
   $data[] = array('ИП (ФИО) Файзулин Иван Рамильевич');
   $data[] = array('ИНН 420541005930 ОГРНИП 312420531200050');
+  // Добваляем пустую строку после шапки
+  $data[] = array();
   $data[] = array(
     'Наименование товара',
-    'Количество',
+    'Артикул',
+    'Кол-во',
     'Цена',
     'Сумма',
   );
-  dsm($order);
 
+  $row = array();
   foreach($order->commerce_line_items ['und'] as $value) {
     $line_item = commerce_line_item_load($value['line_item_id']);
+    if (isset($line_item->commerce_product['und'][0]['product_id'])) {
+      $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
+      $title = $product->title;
+      $articul = $line_item->line_item_label;
+    }
+    // для достаки название в line_item
+    else {
+      $title = $line_item->line_item_label;
+      $articul = '';
+    }
     // Add the order line items
     $row[] = array(
-      $line_item->line_item_label,
+      $title,
+      $articul,
       $line_item->quantity,
       $line_item->commerce_unit_price['und'][0]['amount'] / 100 . ' руб.',
       $line_item->commerce_total['und'][0]['amount'] / 100 . ' руб.',
     );
   }
   $data = array_merge($data, $row);
-  $data[] = array('Наличие кассового чека обязательно');
-  $data[] = array('Итого ' .  $order->commerce_order_total['und'][0]['amount'] / 100 . ' рублей.    Подпись');
+  // Добваляем пустую строку после списка товаров
+  $data[] = array();
+  $data[] = array('Итого ' .  $order->commerce_order_total['und'][0]['amount'] / 100 . ' рублей','', 'Подпись   __________________');
   // Store the file in sites/default/files
   $dir = file_stream_wrapper_get_instance_by_uri('public://')->realpath();
-  $filename = 'Order receipt №' . $order->order_id . '.xls';
+  $filename = 'Order receipt ' . $order->order_id . '.xls';
   $path = "$dir/$filename";
   // Use the .xls format
-  $options = array('format' => 'xls', 'ignore_headers' => TRUE);
+  $options = array('format' => 'xls', 'ignore_headers' => TRUE, 'row_count' => count($row));
   $result = phpexcel_export($headers, $data, $path, $options);
   if ($result == PHPEXCEL_SUCCESS) {
-    drupal_set_message(t("We did it !"));
+    drupal_set_message(t("Файл чека создан и доступен по !url", array('!url' => l('ссылке', file_create_url('public://' . $filename)))));
   }
   else {
-    drupal_set_message(t("Oops ! An error occured !"), 'error');
+    drupal_set_message(t("При создании файла произошла ошибка!"), 'error');
   }
   drupal_goto('admin/commerce/orders/list');
+}
+
+function commerce_order_receipt_phpexcel_export($op, $data, $phpexcel, $options, $column, $row) {
+  if ($op == 'data') {
+    // Формируем массив с форматированием для таблицы.
+    $styleArray = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN,
+        ),
+      ),
+    );
+    // Устанавливаем форматирование для таблицы из ранее созданного массива,
+    // в данном случае границы таблицы.
+    $phpexcel->getActiveSheet()->getStyle('A6:' . 'E' . (6 + $options['row_count']))->applyFromArray($styleArray);
+
+    // Устанавливаем вертикальное выравнивание по верхнему краю, горизонтальное - по
+    // левому и перенос слов.
+    $phpexcel->getActiveSheet()->getStyle('A1:E100')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setWrapText(TRUE);
+
+    // заголовок чека
+    $phpexcel->getActiveSheet()->mergeCells('A1:E1');
+    $phpexcel->getActiveSheet()->getStyle('A1:A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    $phpexcel->getActiveSheet()->getStyle('A1:A1')->getFont()->setBold(true);
+
+    // Строка подписи
+    $sign_row = 6 + $options['row_count'] + 2;
+    $phpexcel->getActiveSheet()->mergeCells('C' . $sign_row . ':E' . $sign_row);
+
+    // Устанавливаем ширину каждой колонки.
+    $phpexcel->getActiveSheet()->getColumnDimension('A')->setWidth(45);
+    $phpexcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
+    $phpexcel->getActiveSheet()->getColumnDimension('C')->setWidth(10);
+    $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+    $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+
+    for ($i = 6; $i <= 6 + $options['row_count']; $i++) {
+      $phpexcel->getActiveSheet()->getStyle('C' . $i . ':C' . $i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+      $phpexcel->getActiveSheet()->getStyle('D' . $i . ':D' . $i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+      $phpexcel->getActiveSheet()->getStyle('E' . $i . ':E' . $i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+    }
+  }
 }
 
 /*

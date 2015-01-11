@@ -552,9 +552,8 @@ function feature_commerce_config_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'commerce_customer',
         'settings' => array(),
-        'type' => 'commerce_customer_profile_reference_display',
+        'type' => 'hidden',
         'weight' => -5,
       ),
     ),
@@ -689,6 +688,40 @@ function feature_commerce_config_field_default_field_instances() {
       ),
       'type' => 'commerce_price_full',
       'weight' => -8,
+    ),
+  );
+
+  // Exported field_instance: 'commerce_order-commerce_order-field_track_code'
+  $field_instances['commerce_order-commerce_order-field_track_code'] = array(
+    'bundle' => 'commerce_order',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => -4,
+      ),
+    ),
+    'entity_type' => 'commerce_order',
+    'field_name' => 'field_track_code',
+    'label' => 'Почтовый код',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => -4,
     ),
   );
 
@@ -830,6 +863,7 @@ function feature_commerce_config_field_default_field_instances() {
   t('Адрес');
   t('В наличии');
   t('Итого');
+  t('Почтовый код');
   t('Цена');
 
   return $field_instances;

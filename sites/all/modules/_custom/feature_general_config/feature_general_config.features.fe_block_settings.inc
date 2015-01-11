@@ -404,7 +404,8 @@ function feature_general_config_default_fe_block_settings() {
     'delta' => 'recently_viewed_product-block',
     'module' => 'views',
     'node_types' => array(),
-    'pages' => 'cart',
+    'pages' => 'cart
+node/*',
     'roles' => array(),
     'themes' => array(
       'omega' => array(

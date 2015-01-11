@@ -100,3 +100,10 @@ function stepug_process_item_list(&$variables){
     $variables['items'][] = $display_all_item;
   }
 }
+
+function stepug_breadcrumb($variables) {
+  // показываем крошки только на странице продуктов
+  if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == '' && ($node = node_load(arg(1))) && $node->type == 'product_display') {
+    return theme_breadcrumb($variables);
+  }
+}

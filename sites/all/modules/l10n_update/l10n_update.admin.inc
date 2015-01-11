@@ -78,7 +78,7 @@ function l10n_update_status_form() {
 
     // Build data options for the select table.
     foreach($updates as $langcode => $update) {
-      $title = check_plain($languages[$langcode]->name);
+      $title = check_plain($languages[$langcode]);
       $l10n_update_update_info = array('#theme' => 'l10n_update_update_info');
       foreach (array('updates', 'not_found') as $update_status) {
         if (isset($update[$update_status])) {
@@ -271,7 +271,7 @@ function l10n_update_admin_settings_form($form, &$form_state) {
 function l10n_update_admin_settings_form_validate($form, &$form_state) {
   // Check for existing translations directory and create one if required.
   $directory = $form_state['values']['l10n_update_download_store'];
-  if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY & FILE_MODIFY_PERMISSIONS)) {
+  if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
     form_set_error('l10n_update_download_store', t('The directory %directory does not exist or is not writable.', array('%directory' => $directory)));
     watchdog('file system', 'The directory %directory does not exist or is not writable.', array('%directory' => $directory), WATCHDOG_ERROR);
   }

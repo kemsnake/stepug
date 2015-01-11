@@ -38,6 +38,28 @@ function commerce_apd_permission() {
 
 /**
  * Implements hook_form_alter().
+ */
+function commerce_apd_form_commerce_product_ui_product_delete_form_alter(&$form, &$form_state, $form_id) {
+  // Add one submit handler to delete product display after product deletion.
+  $form['#submit'][] = '_commerce_apd_delete_referencing_node';
+  // Reverse the array so the new function will be executed first.
+  $form['#submit'] = array_reverse($form['#submit']);
+}
+
+/**
+ * Form submission handler for deleting product display.
+ */
+function _commerce_apd_delete_referencing_node($form, &$form_state) {
+  // Get the referencing node.
+  $referencing_nodes = _commerce_apd_get_nodes_referencing($form_state['product']->product_id);
+  // Make sure there is only one node referenced to the product and the configuration is set for that.
+  if (count($referencing_nodes) == 1 && variable_get("commerce_apd_auto_delete_display", 0) == 1) {
+    node_delete($referencing_nodes[0]);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
  * Alter the product creation form to add a new option to
  * automatically create product display.
  */
@@ -56,9 +78,6 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
   // Count the existing references.
   $count_existing_references = count($existing_references);
 
-  // Unset session that holds the referenced node id if exists.
-  unset($_SESSION['commerce_apd_referenced_nid']);
-
   // If new product creation or no referencing node found.
   if (isset($form_state['commerce_product']->is_new) || $count_existing_references <= 1) {
     // Check if the product display creation form should be displayed automatically.
@@ -72,9 +91,12 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
       // Load the node.
       $node = node_load($existing_references[0]);
 
-      // Save node id to session for deciding to update node or create new node
+      // Save node id to a hidden input for deciding to update node or create new node
       // when the form is submitted.
-      $_SESSION['commerce_apd_referenced_nid'] = $existing_references[0];
+      $form['commerce_apd_referenced_nid'] = array(
+        "#type" => "hidden",
+        "#value" => $existing_references[0],
+      );
     }
     else {
       // Prepare node object.
@@ -222,7 +244,7 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
 
   // Check if the product display should be created automatically or
   // the form for creating product display is configured to be displayed automatically.
-  if ($auto_display == TRUE || $show_form == 1 || isset($_SESSION['commerce_apd_referenced_nid'])) {
+  if ($auto_display == TRUE || $show_form == 1 || isset($form_state['values']['commerce_apd_referenced_nid'])) {
     // Get the default content type for product display
     $content_type = _commerce_apd_get_content_type($form_state['commerce_product']->type);
 
@@ -233,12 +255,11 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
     $lang = LANGUAGE_NONE;
 
     // If there is no session storing the referenced node id, create a new node
-    if (!isset($_SESSION['commerce_apd_referenced_nid'])) {
+    if (!isset($form_state['values']['commerce_apd_referenced_nid'])) {
       // Set some fields value.
       $node = new stdClass();
       $node->is_new = TRUE;
       $node->type = $content_type;
-      $node->status = 1;
       $node->uid = $user->uid;
       $node->title = $form_state['values']['title'];
 
@@ -257,11 +278,8 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
 
       // Loop through attached form
       foreach ($form2 as $field => $value) {
-        // @todo delete hardcode after metatags updated
-        if ($field != '#metatags') {
-          // Fill the node form for submission.
-          $node_form[$field] = $form[$field];
-        }
+        // Fill the node form for submission.
+        $node_form[$field] = $form[$field];
       }
 
       // Add other fields (if any) to the node class,
@@ -275,13 +293,44 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
         ),
       );
 
-      // Check node promotion and sticky option.
-      $options = variable_get('node_options_' . $node->type, array());
-      if (count($options) == 0 || in_array('promote', $options)) {
+      // Check node publishing option.
+      $options = variable_get('node_options_' . $node->type, 0);
+      if ($options == 0) {
+        $node->status = 1;
+      }
+      else {
+        if (in_array('status', $options)) {
+          $node->status = 1;
+        }
+        else {
+          $node->status = 0;
+        }
+      }
+
+      // Check node promotion.
+      if ($options == 0) {
         $node->promote = 1;
       }
-      if (in_array('sticky', $options)) {
-        $node->sticky = 1;
+      else {
+        if (in_array('promote', $options)) {
+          $node->promote = 1;
+        }
+        else {
+          $node->promote = 0;
+        }
+      }
+
+      // Check sticky option.
+      if (is_array($options)) {
+        if (in_array('sticky', $options)) {
+          $node->sticky = 1;
+        }
+        else {
+          $node->sticky = 0;
+        }
+      }
+      else {
+        $node->sticky = 0;
       }
 
       // Check node comment option.
@@ -302,7 +351,7 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
     }
     else {
       // Update existing node.
-      $node = node_load($_SESSION['commerce_apd_referenced_nid']);
+      $node = node_load($form_state['values']['commerce_apd_referenced_nid']);
 
       // Make sure if node exists.
       if (is_object($node)) {

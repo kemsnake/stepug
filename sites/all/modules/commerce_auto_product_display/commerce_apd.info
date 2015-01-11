@@ -3,11 +3,12 @@ description = Automatically create product display on new product creation.
 package = Commerce (contrib)
 dependencies[] = commerce
 dependencies[] = commerce_product_ui
+configure = admin/commerce/config/auto-product-display
 core = 7.x
 
-; Information added by drupal.org packaging script on 2013-01-05
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2014-11-30
+version = "7.x-1.5"
 core = "7.x"
 project = "commerce_auto_product_display"
-datestamp = "1357356433"
+datestamp = "1417319581"
 

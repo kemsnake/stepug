@@ -37,8 +37,9 @@ function hook_l10n_update_projects_alter(&$projects) {
     'project_type'  => 'module',
     'name' => 'new_example_project',
     'info' => array(
-      'version' => '6.x-1.5',
-      'core' => '6.x',
+      'name' => 'New example project',
+      'version' => '7.x-1.5',
+      'core' => '7.x',
       'l10n path' => 'http://example.com/files/translations/%core/%project/%project-%release.%language.po',
     ),
   );

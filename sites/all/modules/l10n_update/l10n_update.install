@@ -161,12 +161,21 @@ function l10n_update_install() {
   db_add_field('locales_target', 'l10n_status', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
   variable_set('l10n_update_rebuild_projects', 1);
 
-  // Create the translation directory.
-  $path = variable_get('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH);
-  if (!file_prepare_directory($path, FILE_CREATE_DIRECTORY & FILE_MODIFY_PERMISSIONS)) {
-    watchdog('l10n_update', 'The directory %directory does not exist or is not writable.', array('%directory' => $path), WATCHDOG_ERROR);
-    drupal_set_message(t('The directory %directory does not exist or is not writable.', array('%directory' => $path)), 'error');
+  // Create the translation directory. We try different alternative paths as the
+  // default may not always be writable.
+  $directories = array(
+    variable_get('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH),
+    variable_get('file_public_path', conf_path() . '/files') . '/translations',
+    'sites/default/files/translations',
+  );
+  foreach ($directories as $directory) {
+    if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+      variable_set('l10n_update_download_store', $directory);
+      return;
+    }
   }
+  watchdog('l10n_update', 'The directory %directory does not exist or is not writable.', array('%directory' => $directories[0]), WATCHDOG_ERROR);
+  drupal_set_message(t('The directory %directory does not exist or is not writable.', array('%directory' => $directories[0])), 'error');
 }
 
 /**
@@ -203,10 +212,10 @@ function l10n_update_requirements($phase) {
         foreach ($status as $project) {
           foreach ($project as $langcode => $project_info) {
             if (empty($project_info->type)) {
-              $untranslated[$langcode] = $languages[$langcode]->name;
+              $untranslated[$langcode] = $languages[$langcode];
             }
             elseif ($project_info->type == L10N_UPDATE_LOCAL || $project_info->type == L10N_UPDATE_REMOTE) {
-              $available_updates[$langcode] = $languages[$langcode]->name;
+              $available_updates[$langcode] = $languages[$langcode];
             }
           }
         }
@@ -311,11 +320,21 @@ function l10n_update_update_7200() {
   if (!variable_get('l10n_update_download_store', '')) {
     variable_set('l10n_update_download_store', 'sites/all/translations');
   }
-  $path = variable_get('l10n_update_download_store', 'sites/all/translations');
-  if (!file_prepare_directory($path, FILE_CREATE_DIRECTORY & FILE_MODIFY_PERMISSIONS)) {
-    watchdog('l10n_update', 'The directory %directory does not exist or is not writable.', array('%directory' => $path), WATCHDOG_ERROR);
-    drupal_set_message(t('The directory %directory does not exist or is not writable.', array('%directory' => $path)), 'error');
+  // Create the translation directory. We try different alternative paths as the
+  // default may not always be writable.
+  $directories = array(
+    variable_get('l10n_update_download_store', L10N_UPDATE_DEFAULT_TRANSLATION_PATH),
+    variable_get('file_public_path', conf_path() . '/files') . '/translations',
+    'sites/default/files/translations',
+  );
+  foreach ($directories as $directory) {
+    if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+      variable_set('l10n_update_download_store', $directory);
+      return;
+    }
   }
+  watchdog('l10n_update', 'The directory %directory does not exist or is not writable.', array('%directory' => $directories[0]), WATCHDOG_ERROR);
+  drupal_set_message(t('The directory %directory does not exist or is not writable.', array('%directory' => $directories[0])), 'error');
 
   // Translation source 'Remote server only' is no longer supported. Use 'Remote
   // and local' instead.

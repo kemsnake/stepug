@@ -68,6 +68,16 @@ function _commerce_apd_configuration($form, &$form_state) {
     "#default_value" => variable_get("commerce_apd_show_product_display_form", 0),
   );
 
+  // The option to set if product display creation form should be displayed automatically.
+  $form["commerce_apd_configuration"]["auto_delete_display"] = array(
+    "#title" => t("Delete product display automatically after product deletion"),
+    "#description" => t("Choose 'Yes' to automatically delete the product display after the product deletion."),
+    "#type" => "select",
+    "#options" => array(1 => t('Yes'), 0 => t('No')),
+    "#required"  => TRUE,
+    "#default_value" => variable_get("commerce_apd_auto_delete_display", 0),
+  );
+
   // Form submit button.
   $form["commerce_apd_configuration"]["submit"] = array(
     "#value" => t("Submit"),
@@ -90,6 +100,7 @@ function _commerce_apd_configuration_submit($form, &$form_state) {
   // Saved the selected content type to variable.
   variable_set("commerce_apd_product_display", $product_display);
   variable_set("commerce_apd_show_product_display_form", $form_state["values"]["show_product_display_form"]);
+  variable_set("commerce_apd_auto_delete_display", $form_state["values"]["auto_delete_display"]);
 
   // Display the message to user.
   drupal_set_message(t("The configuration option has been saved."));

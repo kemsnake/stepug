@@ -733,10 +733,10 @@ function l10n_update_status_delete_projects($projects) {
  * Returns list of translatable languages.
  *
  * @return array
- *   Array of installed languages keyed by language name. English is omitted.
+ *   Array of enabled languages keyed by language name. English is omitted.
  */
 function l10n_update_translatable_language_list() {
-  $languages = language_list();
+  $languages = locale_language_list('name');
   unset($languages['en']);
   return $languages;
 }

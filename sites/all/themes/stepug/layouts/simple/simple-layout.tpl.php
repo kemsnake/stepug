@@ -1,6 +1,6 @@
 <div<?php print $attributes; ?>>
   <header class="l-header" role="banner">
-    <div class="l-branding">
+    <div class="l-branding col-xs-5 col-sm-5 col-md-6 col-lg-4">
       <?php if ($logo): ?>
         <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" class="site-logo"><img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /></a>
       <?php endif; ?>
@@ -20,12 +20,21 @@
       <?php print render($page['branding']); ?>
     </div>
 
-    <?php print render($page['header']); ?>
-    <?php print render($page['navigation']); ?>
+    <div class="l-branding-menu col-xs-7 col-sm-7 col-md-6 col-lg-8">
+      <?php print render($page['header']); ?>
+    </div>
+    <div class="l-navigation col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+
+      <?php print render($page['navigation']); ?>
+    </div>
   </header>
 
   <div class="l-main">
-    <div class="l-content" role="main">
+    <div class="l-first-sidebar col-xs-4 col-sm-4 col-md-3 col-lg-3 pull-left">
+      <?php print render($page['sidebar_first']); ?>
+    </div>
+    <div class="l-content col-xs-8 col-sm-8 col-md-9 col-lg-9" role="main">
       <?php print render($page['highlighted']); ?>
       <?php print $breadcrumb; ?>
       <a id="main-content"></a>
@@ -44,11 +53,13 @@
       <?php print $feed_icons; ?>
     </div>
 
-    <?php print render($page['sidebar_first']); ?>
+
     <?php print render($page['sidebar_second']); ?>
   </div>
 
   <footer class="l-footer" role="contentinfo">
-    <?php print render($page['footer']); ?>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <?php print render($page['footer']); ?>
+    </div>
   </footer>
 </div>

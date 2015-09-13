@@ -59,32 +59,31 @@
 
     // Add a spinner on quantity widget.
     Drupal.behaviors.quantityWidgetSpinner = {
-        attach: function ( context, settings ) {
-            // скрываем поле количество если товара нет в наличии
-            $('.commerce-add-to-cart .form-button-disabled').each(function(){
-                var parent = $(this).parent().parent();
-                console.log();
-                $('#' + parent.attr('id') + ' .form-item-quantity').css('display', 'none');
+      attach: function ( context, settings ) {
+        // скрываем поле количество если товара нет в наличии
+        $('.commerce-add-to-cart .form-button-disabled').each(function(){
+            var parent = $(this).parent().parent();
+            $('#' + parent.attr('id') + ' .form-item-quantity').css('display', 'none');
+        });
+        // добавляем спиннер(стрелки) к полю количество
+        var quantity = $('.form-item-quantity input, .views-field-edit-quantity input');
+        if (quantity.length > 0){
+            quantity.spinner({
+                min: 1,
+                max: 99,
+                increment: 'fast'
             });
-            // добавляем спиннер(стрелки) к полю количество
-            var quantity = $('.form-item-quantity input');
-            if (quantity.length > 0){
-                quantity.spinner({
-                    min: 1,
-                    max: 99,
-                    increment: 'fast'
-                });
-            }
         }
+      }
     }
 
-    /**
-    * Automatically submit the payment redirect form.
-    */
-    Drupal.behaviors.commercePayment = {
-        attach: function (context, settings) {
-          $('div.payment-redirect-form form', context).submit();
-        }
-    }
+  /**
+  * Automatically submit the payment redirect form.
+  */
+  Drupal.behaviors.commercePayment = {
+      attach: function (context, settings) {
+        $('div.payment-redirect-form form', context).submit();
+      }
+  }
 
 })(jQuery);

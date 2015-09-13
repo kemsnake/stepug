@@ -1,0 +1,6 @@
+name = Commerce Discount Node
+description = Allow discounts to be done on terms attached to the product display (node) instead of the product.
+version = 7.x-0.1
+core = 7.x
+dependencies[] = commerce_discount
+dependencies[] = inline_conditions

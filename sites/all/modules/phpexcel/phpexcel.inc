@@ -121,7 +121,7 @@ function phpexcel_export($headers = array(), $data = array(), $path = '', $optio
       break;
 
     case 'cache_to_sqlite3':
-      $cache_method = PHPExcel_CachedObjectStorageFactory::cache_to_memcache;
+      $cache_method = PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3;
       break;
 
     default:
@@ -155,11 +155,20 @@ function phpexcel_export($headers = array(), $data = array(), $path = '', $optio
 
   _phpexcel_set_columns($xls, $data, empty($options['ignore_headers']) ? $headers : NULL, $options);
 
-  if (!isset($options['format']) || $options['format'] == 'xls') {
-    $writer = new PHPExcel_Writer_Excel5($xls);
-  }
-  else {
-    $writer = new PHPExcel_Writer_Excel2007($xls);
+  $format = isset($options['format']) ? strtolower($options['format']) : 'xls';
+
+  switch($format) {
+    case 'xlsx':
+      $writer = new PHPExcel_Writer_Excel2007($xls);
+      break;
+    case 'csv':
+      $writer = new PHPExcel_Writer_CSV($xls);
+      break;
+    case 'ods':
+      $writer = new PHPExcel_Writer_OpenDocument($xls);
+      break;
+    default:
+      $writer = new PHPExcel_Writer_Excel5($xls);
   }
 
   $writer->save($path);

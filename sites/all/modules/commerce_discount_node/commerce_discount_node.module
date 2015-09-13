@@ -1,0 +1,302 @@
+<?php
+
+/**
+ * Implements hook_inline_conditions_info().
+ */
+function commerce_discount_node_inline_conditions_info() {
+  $conditions = array();
+  
+  $voclist = commerce_discount_node_voclist();
+  
+  foreach($voclist as $voc) {
+    $conditions['commerce_discount_node_product_vid_' . $voc->vid] = array(
+      'label' => t('Taxonomy: !name', array('!name' => $voc->name)),
+      'entity type' => 'commerce_line_item',
+      'callbacks' => array(
+        'configure' => 'commerce_discount_node_product_has_cosmetic_categories_configure',
+        'build' => 'commerce_discount_node_product_has_related_categories_build',
+      ),
+    );
+  }
+
+  return $conditions;
+}
+
+/**
+ * Configuration callback for commerce_discount_node_product_has_cosmetic_categories on product.
+ *
+ * @param array $settings
+ *   Values for the form element.
+ *
+ * @return array
+ *   Return a form element.
+ */
+function commerce_discount_node_product_has_cosmetic_categories_configure($settings) {
+  $form = array();
+
+  $vid = 0;
+  if(isset($_POST['commerce_discount_fields']['inline_conditions']['und'][0]['condition_name'])){
+    $vid = array_pop(explode('_', $_POST['commerce_discount_fields']['inline_conditions']['und'][0]['condition_name']));
+  }
+  
+  $default_value = '';
+  if (!empty($settings['terms'])) {
+    $default_value = $settings['terms'];
+    
+    $terms = explode(', ', $settings['terms']);
+    $tid = substr($terms[0], strrpos($terms[0], '(') + 1,strrpos($terms[0], ')') - strlen($terms[0]));
+    $term = taxonomy_term_load($tid);
+    $vid = $term->vid;
+    /*
+    foreach ($settings['terms'] as $term) {
+      $default_value .= taxonomy_term_load($term['target_id'])->name . ' (' . $term['target_id'] . ')';
+      if ($term != end($settings['terms'])) {
+        $default_value .= ', ';
+      }
+    }
+     */
+  }
+
+  $form['terms'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Terms'),
+    '#title_display' => 'invisible',
+    '#required' => TRUE,
+    '#maxlength' => 4096,
+    '#default_value' => $default_value,
+    '#autocomplete_path' => "commerce_discount_node/autocomplete/$vid",
+    //'#element_validate' => array('_inline_conditions_autocomplete_validate'),
+    '#suffix' => '
+' . t('The discount is active if the product has the selected term(s).') . '
+',);
+  return $form;
+}
+
+/**
+ * Implements hook_inline_conditions_build_alter().
+ */
+function commerce_discount_node_inline_conditions_build_alter(&$value) {
+  switch ($value['condition_name']) {
+    case 'commerce_discount_node_product_has_cosmetic_categories':
+      $terms = $value['condition_settings']['terms'];
+
+      $value['condition_settings']['terms'] = '';
+      foreach ($terms as $term) {
+        $value['condition_settings']['terms'] .= reset($term);
+        if ($term !== end($terms)) {
+          $value['condition_settings']['terms'] .= ', ';
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_rules_condition_info().
+ */
+function commerce_discount_node_rules_condition_info() {
+  $inline_conditions = inline_conditions_get_info();
+  $conditions = array();
+
+  if (module_exists('taxonomy') && module_exists('commerce_product')) {
+    $voclist = commerce_discount_node_voclist();
+  
+    foreach($voclist as $voc) {
+      $conditions['commerce_discount_node_product_vid_' . $voc->vid] = array(
+        'label' => t('Line item product contains specific cosmetic categories'),
+        'parameter' => array(
+          'commerce_line_item' => array(
+            'type' => 'commerce_line_item',
+            'label' => t('Line item'),
+            'description' => t('The line item.'),
+            'wrapped' => TRUE,
+          ),
+          'terms' => array(
+            'type' => 'text',
+            'label' => t('Terms ID'),
+            'description' => t('Enter a comma-separated list of term ID to compare against the node display of the passed product line item.'),
+          ),
+        ),
+        'module' => 'inline_conditions',
+        'group' => t('Commerce Line Item'),
+        'callbacks' => array(
+          'execute' => $inline_conditions['commerce_discount_node_product_vid_' . $voc->vid]['callbacks']['build'],
+        ),
+      );
+    }
+  }
+
+  return $conditions;
+}
+
+/**
+ * Build callback for commerce_discount_node_product_has_cosmetic_categories on product.
+ *
+ * @param EntityDrupalWrapper $wrapper
+ *   Wrapped entity type given by the rule.
+ * @param array $terms
+ *   Values for the condition settings.
+ *
+ * @return bool
+ *   True is condition is valid. false otherwise.
+ */
+function commerce_discount_node_product_has_related_categories_build(EntityDrupalWrapper $wrapper, $terms) {
+  $parts = explode(', ', $terms);
+  
+  $terms_name = array();
+  foreach($parts as $part){
+    $terms_name[] = substr($part, strrpos($part, '(') + 1,strrpos($part, ')') - strlen($part));
+  }
+
+  if (in_array('commerce_product', array_keys($wrapper->getPropertyInfo()))) {
+    $product_id = $wrapper->commerce_product->product_id->value();
+    $related_tids = commerce_discount_node_get_related_term_ids_by_product_id($product_id);
+    $terms_name = array_diff($terms_name, $related_tids);
+  }
+
+  return empty($terms_name);
+}
+
+/**
+ * Returns an array of taxonomy_term IDs of product display nodes that references the given product_id.
+ */
+function commerce_discount_node_get_related_term_ids_by_product_id($product_id, $include_parents = TRUE) {
+  $tids = array();
+
+  // We don't use EFQ but more low-level querying to avoid too much DB joins in this query
+
+  $query = db_select('taxonomy_index', 'ti');
+  $query->fields('ti', array('tid'));
+  if ($include_parents) {
+    $query->join('taxonomy_term_hierarchy', 'tth', "ti.tid = tth.tid");
+    $query->fields('tth', array('parent'));
+  }
+  $query->join('field_data_field_product', 'fdfp', "fdfp.entity_type ='node' AND fdfp.entity_id = ti.nid");
+  $query->condition('fdfp.field_product_product_id', $product_id);
+
+  $result = $query->execute()->fetchAllAssoc('tid');
+  if (!empty($result)) {
+    if ($include_parents) {
+      foreach ($result as $tid => $row) {
+        $tids[$tid] = $tid;
+        if ($row->parent) {
+          $tids[$row->parent] = $row->parent;
+        }
+      }
+      $tids = array_keys($tids);
+    }
+    else {
+      $tids = array_keys($result);
+    }
+  }
+
+  return $tids;
+}
+
+/**
+ * @return array of all vocabularies connected to a content type which in turn is connected to a commerce product.
+ */
+function commerce_discount_node_voclist() {
+// Get map of all fields.
+  $field_map = field_info_field_map();
+
+  // Make a map with all content types having product referernce and a map with term reference.
+  $content_types_with_product_reference = array();
+  $content_types_with_term_reference = array();
+  foreach ($field_map as $field_name => $field_properties) {
+    if ($field_properties['type'] == 'commerce_product_reference' && isset($field_properties['bundles']['node'])) {
+      $content_types_with_product_reference = array_merge($content_types_with_product_reference, $field_properties['bundles']['node']);
+    }
+    else if ($field_properties['type'] == 'taxonomy_term_reference' && isset($field_properties['bundles']['node'])) {
+      foreach($field_properties['bundles']['node'] as $content_type) {
+         $content_types_with_term_reference[$content_type][] = $field_name;
+      }
+    }
+  }
+
+  // Clean up.
+  $content_types_with_product_reference = array_unique(array_filter($content_types_with_product_reference));
+
+  // Combine both maps.
+  $content_types_with_product_and_term_reference = array();
+  foreach($content_types_with_product_reference as $content_type) {
+    if(isset($content_types_with_term_reference[$content_type])){
+      $content_types_with_product_and_term_reference[$content_type] = $content_types_with_term_reference[$content_type];
+    }
+  }
+
+  $voclist = array();
+  foreach($content_types_with_product_and_term_reference as $fields) {
+    foreach($fields as $field_name) {
+      $field_info = field_info_field($field_name);
+      
+      if(isset($field_info['settings']['allowed_values'])) {
+        foreach ($field_info['settings']['allowed_values'] as $value) {
+          $voclist[$value['vocabulary']] = taxonomy_vocabulary_machine_name_load($value['vocabulary']);
+        }
+      }
+    }
+  }  
+  
+  
+  return $voclist;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_discount_node_menu() {
+  $items = array();
+
+  $items['commerce_discount_node/autocomplete'] = array(
+    'title' => 'Commerce discount node Autocomplete',
+    'page callback' => 'commerce_discount_node_autocomplete_callback',
+    //'page arguments' => array(2, 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function commerce_discount_node_autocomplete_callback($vid, $string) {
+  $matches = array();
+  $entity_type = 'taxonomy_term';
+  $entity_info = entity_get_info($entity_type);
+
+  // The user enters a comma-separated list of tags.
+  // We only autocomplete the last tag.@
+  $tags_typed = drupal_explode_tags($string);
+  $tag_last = drupal_strtolower(array_pop($tags_typed));
+  if (!empty($tag_last)) {
+    $prefix = count($tags_typed) ? implode(', ', $tags_typed) . ', ' : '';
+ 
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', $entity_type);
+    $query->propertyCondition($entity_info['entity keys']['label'], $tag_last, 'CONTAINS');
+    $query->addTag($entity_type . '_access');
+    $query->range(0, 10);
+    $query->propertyCondition('vid', array($vid));
+
+    $results = $query->execute();
+    if (!empty($results[$entity_type])) {
+      $entities = entity_load($entity_type, array_keys($results[$entity_type]));
+      foreach ($entities as $entity_id => $entity) {
+        $label = entity_label($entity_type, $entity);
+        $label = check_plain($label);
+
+        $key = "$label ($entity_id)";
+        // Strip things like starting/trailing white spaces,
+        // line breaks and tags.
+        $key = preg_replace('/\s\s+/', ' ', str_replace("\n", '', trim(decode_entities(strip_tags($key)))));
+        // Names containing commas or quotes must be wrapped in quotes.
+        if (strpos($key, ',') !== FALSE || strpos($key, '"') !== FALSE) {
+          $key = '"' . str_replace('"', '""', $key) . '"';
+        }
+        $matches[$prefix . $key] = '<div class="reference-autocomplete">' . $label . '</div>';
+      }
+    }
+  }
+
+  drupal_json_output($matches);
+}

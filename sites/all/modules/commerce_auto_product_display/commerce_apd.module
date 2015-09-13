@@ -117,6 +117,29 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
     // Unset product reference field.
     unset($form2[$field_product]);
 
+    // Get language.
+    $lang = LANGUAGE_NONE;
+
+    // Check the required field to be conditionally validated depending on
+    // whether 'Create product display' option is checked.
+    // Collect them in array first.
+    $validate_next = array();
+    foreach ($form2 as $key=>$value) {
+      if (substr($key, 0, 1) != "#") {
+        // Single value field.
+        if (isset($form2[$key][$lang]['#required'])) {
+          if ($form2[$key][$lang]['#required'] == 1) {
+            $validate_next[] = $key;
+          }
+        }
+        elseif (isset($form2[$key][$lang][0]['#required'])) { // Multiple value field
+          if ($form2[$key][$lang][0]['#required'] == 1) {
+            $validate_next[] = $key;
+          }
+        }
+      }
+    }
+
     // Variables for storing the first and last field name.
     $first = "";
     $last = "";
@@ -183,6 +206,26 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
           'id' => 'auto-display-checkbox',
         ),
       );
+
+      // Remove required field to be validated next.
+      foreach ($validate_next as $key) {
+        // Single value field
+        if (isset($form[$key][$lang]['#required'])) {
+          $form[$key][$lang]['#required'] = 0;
+        }
+        elseif (isset($form[$key][$lang][0]['#required'])) { // Multiple value field
+          $form[$key][$lang][0]['#required'] = 0;
+        }
+      }
+
+      // Field name list to be validated next.
+      $form['validate_next'] = array(
+        '#type' => 'value',
+        '#value' => implode(",", $validate_next), 
+      );
+
+      // Validation callback.
+      $form['actions']['submit']['#validate'][] = "commerce_apd_product_form_reference_validate";
     }
 
     // Based on the first and the last field name, we can wrap the attached form
@@ -200,7 +243,9 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
     if ($show_form == 0 && $count_existing_references == 0) {
       // The javascript for hiding the product display creation form
       // for the first time.
-      drupal_add_js('jQuery(document).ready(function(){ if (jQuery("#auto-display-checkbox").attr("checked")=="checked") { jQuery("#create-display-fieldset").show(); } else { jQuery("#create-display-fieldset").hide(); } })', 'inline');
+      $form['#attached']['js'] = array(
+        drupal_get_path('module', 'commerce_apd') . '/js/commerce_apd.js',
+      );
     }
   }
   else {
@@ -231,6 +276,52 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
 }
 
 /**
+ * Handle the form validation process to validate required field if necessary.
+ */
+function commerce_apd_product_form_reference_validate($form, &$form_state) {
+  // Get language.
+  $lang = LANGUAGE_NONE;
+
+  // Validate required fields if only the auto display option is checked. 
+  if ($form_state['values']['auto_display'] == TRUE) {
+    // Get the list of fields which will be validated.
+    // Store them in array.
+    $arr_field = explode(",", $form_state['values']['validate_next']);
+    foreach ($arr_field as $field) {
+      // Initialize variables.
+      $functions = array();
+      $element = "";
+
+      // Single value field.
+      if (isset($form[$field][$lang]['#element_validate'])) {
+        // Set it to required to be validated.
+        $form[$field][$lang]['#required'] = 1;
+        // Get the validation functions for this field.
+        $functions = $form[$field][$lang]['#element_validate'];
+        // Get the element to be validated.
+        $element = $form[$field][$lang];
+      }
+      elseif (isset($form[$field][$lang][0]['#element_validate'])) { // Multiple value field
+        // Set it to required to be validated.
+        $form[$field][$lang][0]['#required'] = 1;
+        // Get the validation functions for this field.
+        $functions = $form[$field][$lang][0]['#element_validate'];
+        // Get the element to be validated.
+        $element = $form[$field][$lang][0];
+      }
+
+      // If element and validation function exists.
+      if (count($functions) > 0 && $element != "") {
+        // Validate the field based on the functions.
+        foreach ($functions as $function) {
+          $function($element, $form_state);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Handle the form submission process. Product display will be created here.
  */
 function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
@@ -251,7 +342,7 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
     // Get the field name which type is product reference.
     $field_product = _commerce_apd_get_product_field($content_type);
 
-    // Set language
+    // Get language.
     $lang = LANGUAGE_NONE;
 
     // If there is no session storing the referenced node id, create a new node
@@ -453,11 +544,13 @@ function _commerce_apd_get_product_reference_detail($existing_reference, $produc
 function _commerce_apd_get_product_field($content_type) {
   $field = "";
 
-  // Select the product reference field from content type.
-  $rs = db_query("SELECT a.field_name FROM {field_config_instance} a
+  // Select the product reference field from content type (LIMIT TO 1 PRODUCT DISPLAY ONLY).
+  $rs = db_query_range("SELECT a.field_name FROM {field_config_instance} a
     INNER JOIN {field_config} b ON a.field_id = b.id
-    WHERE a.entity_type='node' AND a.bundle='" . $content_type . "' AND
-      b.type='commerce_product_reference' AND b.module='commerce_product_reference' LIMIT 0,1");
+    WHERE a.entity_type = :type AND a.bundle= :bundle AND
+      b.type = :reference AND b.module = :reference" , 0, 1,
+    array(':type' => 'node', ':bundle' => $content_type, ':reference' => 'commerce_product_reference')
+  );
   if ($rs->rowCount() > 0) {
     $data = $rs->fetchObject();
     $field = $data->field_name;

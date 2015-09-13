@@ -1,27 +1,6 @@
 <?php
 
 /**
-* Implements hook_library().
-*/
-function custom_stepug_library() {
-  $libraries['jquery_ui_spinner'] = array(
-    'title' => 'jQuery Spinner',
-    'website' => 'http://github.com/btburnett3/jquery.ui.spinner/',
-    'version' => '1.8',
-    'js' => array(
-      libraries_get_path('jquery_ui_spinner') . '/ui.spinner.min.js' => array(),
-    ),
-    'css' => array(
-      libraries_get_path('jquery_ui_spinner') . '/ui.spinner.css' => array(),
-    ),
-    'dependencies' => array(
-      array('system', 'ui.widget'),
-    ),
-  );
-  return $libraries;
-}
-
-/**
  * Implements hook_menu().
  */
 function custom_stepug_menu() {
@@ -38,9 +17,46 @@ function custom_stepug_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['transform_to_cart/%'] = array(
+    'title' => 'Вернуть товар в корзину',
+    'page callback' => 'transform_checkout_order_to_cart',
+    'page arguments' => array(1),
+    'access callback' => 'commerce_order_customer_order_edit_access',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
+/**
+ * Проверяет что заказ не в статусе корзина и пользователь может менять данный заказ
+ */
+function commerce_order_customer_order_edit_access($order_id) {
+  $order = commerce_order_load($order_id);
+  if (!$order) {
+    return MENU_NOT_FOUND;
+  }
+  // If the order is in a shopping cart order status...
+  if (in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+    // Do not allow the customer to see the page.
+    return FALSE;
+  }
+
+  // Otherwise fallback on normal order access.
+  return commerce_order_access('update', $order);
+}
+
+function transform_checkout_order_to_cart ($order_id) {
+  $order = commerce_order_load($order_id);
+  if (!$order) {
+    return MENU_NOT_FOUND;
+  }
+
+  $order->status = 'cart';
+  commerce_order_save($order);
+  drupal_set_message('Ваш заказ помещен обратно в корзину, теперь вы можете его отредактировать.');
+  drupal_goto('cart');
+}
 /**
  * Implements hook_menu().
  */
@@ -82,16 +98,20 @@ function custom_stepug_robokassa_fail() {
 }
 
 function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
-  if (strstr($form_id, 'commerce_cart_add_to_cart_form')) {
-    $form['#attached']['library'][] = array('custom_stepug', 'jquery_ui_spinner');
+  if (strstr($form_id, 'commerce_cart_add_to_cart_form') || $form_id == 'views_form_commerce_cart_form_default') {
+    drupal_add_library('system', 'ui.spinner');
     $form['quantity']['#title'] = '';
     $form['quantity']['#size'] = 1;
+    $form['submit']['#attributes']['class'] = array('btn', 'btn-default', 'btn-sm');
+  }
+  if($form_id == 'commerce_checkout_form_checkout') {
+    $form['commerce_shipping']['shipping_service']['#ajax']['callback'] = 'custom_stepug_shipping_pane_service_details_refresh';
   }
 
-  //Прячем кнопку поиска и делаем плэйсхолдер для поля поиска
-  if ($form_id == 'views_exposed_form' && $form['#id'] == 'views-exposed-form-popular-products-page-3') {
-    $form['title']['#attributes']['placeholder'] = t('Search');
-    $form['title']['#size'] = 25;
+  // делаем плэйсхолдер для поля поиска
+  if ($form_id == 'search_api_page_search_form_product_search') {
+    $form['keys_2']['#attributes']['placeholder'] = '';
+    $form['keys_2']['#size'] = 15;
   }
 
   // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара
@@ -99,12 +119,21 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
     $form['#access'] = FALSE;
   }
 
-  // убираем форму поиска со стрнацы с результатами. мы изем только по названию товара
+  // убираем языковые настройки с формы редактирования и регистрации пользовтеля
   if ($form_id == 'user_register_form' || ($form_id == 'user_profile_form' && $form['#user_category'] == 'account')) {
     // скрываем языковые настройки от обычных пользователей
     if (!user_access('administer users')) {
       $form['locale']['#access'] = FALSE;
     }
+  }
+  if ($form_id == 'user_login') {
+    $form['name']['#size'] = 55;
+    $form['pass']['#size'] = 55;
+    dsm($form);
+  }
+  if ($form_id == 'user_register_form') {
+    $form['account']['name']['#size'] = 55;
+    $form['account']['mail']['#size'] = 55;
   }
 }
 
@@ -202,4 +231,125 @@ function custom_stepug_feeds_after_save(FeedsSource $source, $entity, $item, $en
   $node->field_product[LANGUAGE_NONE][]['product_id'] = $entity->product_id;
   $node->language = LANGUAGE_NONE;
   node_save($node);
+}
+
+/**
+ * Ajax callback: Returns the shipping details form elements that match the
+ * currently selected shipping service.
+ */
+function custom_stepug_shipping_pane_service_details_refresh($form, &$form_state, $checkout_pane, $order) {
+  // Get order from form
+  list($order, $checkout_pane) = $form_state['build_info']['args'];
+
+  // Load up to date order
+  $order = commerce_order_load($order->order_id);
+
+  // Get selected
+  $service_name = $form['commerce_shipping']['shipping_service']['#default_value'];
+
+  commerce_shipping_service_rate_order($service_name, $order);
+
+  // Delete any existing shipping line items from the order.
+  commerce_shipping_delete_shipping_line_items($order, TRUE);
+
+  // Extract the unit price from the calculated rate.
+  $rate_line_item = $order->shipping_rates[$service_name];
+  $rate_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $rate_line_item);
+  $unit_price = $rate_line_item_wrapper->commerce_unit_price->value();
+
+  // Create a new shipping line item with the calculated rate from the form.
+  $line_item = commerce_shipping_line_item_new($service_name, $unit_price, $order->order_id, $rate_line_item->data, $rate_line_item->type);
+
+  // Save and add the line item to the order.
+  $new_line_item = commerce_shipping_add_shipping_line_item($line_item, $order, TRUE);
+  commerce_order_save($order);
+
+  // Update shipping form
+  $commands[] = ajax_command_replace('#' . $form['commerce_shipping']['service_details']['#id'], render($form['commerce_shipping']['service_details']));
+
+  // Update checkout cart review
+  list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
+  $commands[] = ajax_command_replace('.view-commerce-cart-summary', commerce_embed_view($view_id, $display_id, array($order->order_id)));
+
+  /*if ($service_name == 'pickup') {
+    $commands[] = ajax_command_css('#edit-customer-profile-shipping', array('display' => 'none'));
+    //$commands[] = ajax_command_invoke('#edit-customer-profile-shipping input', 'removeClass', array('required'));
+  }
+  else {
+    $commands[] = ajax_command_css('#edit-customer-profile-shipping', array('display' => 'block'));
+    //$commands[] = ajax_command_invoke('#edit-customer-profile-shipping input', 'addClass', array('required'));
+  }*/
+
+  $commands[] = ajax_command_after('.main form', theme('status_messages'));
+
+  // $commands[] = ajax_command_after('.'.$form['#attributes']['class'][1].':eq(0)',theme('status_messages'));
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+/*
+ * Добавляем метод доставки по умолчанию в новый заказ
+ * для отображения строки доставки в форме чекаута.
+ */
+function custom_stepug_commerce_checkout_router($order, $checkout_page) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    // If this line item is a shipping line item...
+    if ($line_item_wrapper->type->value() == 'shipping') {
+      return;
+    }
+  }
+  // Default shipping service
+  $service_name = 'pickup';
+  commerce_shipping_service_rate_order($service_name, $order);
+
+  // Extract the unit price from the calculated rate.
+  $rate_line_item = $order->shipping_rates[$service_name];
+  $rate_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $rate_line_item);
+  $unit_price = $rate_line_item_wrapper->commerce_unit_price->value();
+
+  // Create a new shipping line item with the calculated rate from the form.
+  $line_item = commerce_shipping_line_item_new($service_name, $unit_price, $order->order_id, $rate_line_item->data, $rate_line_item->type);
+
+  // Save and add the line item to the order.
+  $new_line_item = commerce_shipping_add_shipping_line_item($line_item, $order, TRUE);
+  commerce_order_save($order);
+
+}
+
+function custom_stepug_entity_load($entities, $type) {
+  if ($type == 'search_api_page') {
+    foreach ($entities as $entity) {
+      $entity->options['per_page'] = 16;
+    }
+  }
+}
+function custom_stepug_entity_view($entity, $type, $view_mode, $langcode) {
+  if (isset($entity->type) && $entity->type == 'commerce_order' && $view_mode == 'customer') {
+    $statuses = commerce_order_status_options_list();
+    $entity->content['order-status'] = array(
+      '#markup' => '<div class="order-status"><label class="inline">Статус заказа: </label>
+      <div class="order-status-value">' . $statuses['Оформление заказа'][$entity->status] .'</div></div>'
+    );
+    $entity->content['actions'] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array(
+        'class' => array('checkout-buttons'),
+      ),
+    );
+    $entity->content['actions']['continue'] = array(
+      '#markup' => l(t('Continue to next step'), '/checkout/' . $entity->order_id,
+      array('attributes' => array(
+        'class' => array('checkout-continue', 'form-submit', 'btn-lg')
+      ))),
+    );
+    $entity->content['actions']['operator'] = array(
+      '#markup' => '<span class="button-operator">или</span>',
+    );
+    $entity->content['actions']['transform_to_cart'] = array(
+      '#markup' => l('Изменить заказ', '/transform_to_cart/' . $entity->order_id,
+      array('attributes' => array(
+        'class' => array('checkout-cancel', 'form-submit', 'btn-lg')
+      )))
+    );
+  }
 }

@@ -19,7 +19,6 @@ function commerce_order_receipt_menu() {
 
 function commerce_order_receipt_print_order($order) {
   module_load_include('inc', 'phpexcel');
-  $headers = array();
   $data[] = array('Товарный чек №' . $order->order_id . ' от ' . format_date($order->created, 'custom', 'd.m.Y'));
   $data[] = array();
   $data[] = array('ИП (ФИО) Файзулин Иван Рамильевич');
@@ -66,7 +65,8 @@ function commerce_order_receipt_print_order($order) {
   $path = "$dir/$filename";
   // Use the .xls format
   $options = array('format' => 'xls', 'ignore_headers' => TRUE, 'row_count' => count($row));
-  $result = phpexcel_export($headers, $data, $path, $options);
+  @drupal_unlink($path);
+  $result = phpexcel_export(NULL, $data, $path, $options);
   if ($result == PHPEXCEL_SUCCESS) {
     drupal_set_message(t("Файл чека создан и доступен по !url", array('!url' => l('ссылке', file_create_url('public://' . $filename)))));
   }

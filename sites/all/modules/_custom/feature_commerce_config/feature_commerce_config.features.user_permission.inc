@@ -265,7 +265,9 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'create commerce_customer_profile entities of bundle shipping'.
   $permissions['create commerce_customer_profile entities of bundle shipping'] = array(
     'name' => 'create commerce_customer_profile entities of bundle shipping',
-    'roles' => array(),
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
     'module' => 'commerce_customer',
   );
 
@@ -284,6 +286,7 @@ function feature_commerce_config_user_default_permissions() {
     'name' => 'create commerce_order entities of bundle commerce_order',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
       'менеджер магазина' => 'менеджер магазина',
     ),
     'module' => 'commerce_order',
@@ -480,7 +483,10 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'edit any commerce_customer_profile entity of bundle shipping'.
   $permissions['edit any commerce_customer_profile entity of bundle shipping'] = array(
     'name' => 'edit any commerce_customer_profile entity of bundle shipping',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'менеджер магазина' => 'менеджер магазина',
+    ),
     'module' => 'commerce_customer',
   );
 
@@ -575,7 +581,9 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'edit own commerce_customer_profile entities of bundle shipping'.
   $permissions['edit own commerce_customer_profile entities of bundle shipping'] = array(
     'name' => 'edit own commerce_customer_profile entities of bundle shipping',
-    'roles' => array(),
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
     'module' => 'commerce_customer',
   );
 
@@ -721,7 +729,10 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'view any commerce_customer_profile entity of bundle shipping'.
   $permissions['view any commerce_customer_profile entity of bundle shipping'] = array(
     'name' => 'view any commerce_customer_profile entity of bundle shipping',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'менеджер магазина' => 'менеджер магазина',
+    ),
     'module' => 'commerce_customer',
   );
 
@@ -802,7 +813,9 @@ function feature_commerce_config_user_default_permissions() {
   // Exported permission: 'view own commerce_customer_profile entities of bundle shipping'.
   $permissions['view own commerce_customer_profile entities of bundle shipping'] = array(
     'name' => 'view own commerce_customer_profile entities of bundle shipping',
-    'roles' => array(),
+    'roles' => array(
+      'authenticated user' => 'authenticated user',
+    ),
     'module' => 'commerce_customer',
   );
 
@@ -811,6 +824,7 @@ function feature_commerce_config_user_default_permissions() {
     'name' => 'view own commerce_order entities',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
       'менеджер магазина' => 'менеджер магазина',
     ),
     'module' => 'commerce_order',
@@ -821,6 +835,7 @@ function feature_commerce_config_user_default_permissions() {
     'name' => 'view own commerce_order entities of bundle commerce_order',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
       'менеджер магазина' => 'менеджер магазина',
     ),
     'module' => 'commerce_order',

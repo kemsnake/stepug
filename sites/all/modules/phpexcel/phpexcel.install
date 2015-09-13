@@ -6,5 +6,5 @@
  */
 
 function phpexcel_enable() {
-  drupal_set_message(t("In order to use PHPExcel, you must first download the entire library (1.7) at !link and put it under <em>sites/*/libraries/PHPExcel/</em> (so you should have <em>sites/*/libraries/PHPExcel/Classes/PHPExcel.php</em>). Be careful, as the Libraries API module will look fir the <em>changelog.txt</em> file shipped with PHPExcel. Be sure to include it as well, as to have <em>sites/*/libraries/PHPExcel/changelog.txt</em>.", array('!link' => '<a href="http://www.phpexcel.net">phpexcel.net</a>')), 'warning');
+  drupal_set_message(t("In order to use PHPExcel, you must first download the entire library (1.8.*) at !link and put it under sites/*/libraries/PHPExcel/ (so you should have sites/*/libraries/PHPExcel/Classes/PHPExcel.php). Make sure to include the changelog.txt file as well (sites/*/libraries/PHPExcel/changelog.txt), as Library API requires this file for loading the classes.", array('!link' => '<a href="https://github.com/PHPOffice/PHPExcel">Github</a>')), 'warning');
 }

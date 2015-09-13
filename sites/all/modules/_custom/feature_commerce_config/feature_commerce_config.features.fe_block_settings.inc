@@ -37,7 +37,7 @@ function feature_commerce_config_default_fe_block_settings() {
         'region' => 'header',
         'status' => 1,
         'theme' => 'stepug',
-        'weight' => -14,
+        'weight' => -16,
       ),
     ),
     'title' => '',
@@ -71,6 +71,172 @@ cart*',
         'status' => 0,
         'theme' => 'stepug',
         'weight' => -10,
+      ),
+    ),
+    'title' => '',
+    'visibility' => 0,
+  );
+
+  $export['search_api_page-product_search'] = array(
+    'cache' => 5,
+    'custom' => 0,
+    'delta' => 'product_search',
+    'module' => 'search_api_page',
+    'node_types' => array(),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'stepug',
+        'weight' => 0,
+      ),
+    ),
+    'title' => '<none>',
+    'visibility' => 0,
+  );
+
+  $export['views-popular_products-block_1'] = array(
+    'cache' => -1,
+    'custom' => 0,
+    'delta' => 'popular_products-block_1',
+    'module' => 'views',
+    'node_types' => array(),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'stepug',
+        'weight' => 0,
+      ),
+    ),
+    'title' => '',
+    'visibility' => 0,
+  );
+
+  $export['views-popular_products-block_2'] = array(
+    'cache' => -1,
+    'custom' => 0,
+    'delta' => 'popular_products-block_2',
+    'module' => 'views',
+    'node_types' => array(),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'stepug',
+        'weight' => 0,
+      ),
+    ),
+    'title' => '',
+    'visibility' => 0,
+  );
+
+  $export['views-recently_viewed_product-block_1'] = array(
+    'cache' => -1,
+    'custom' => 0,
+    'delta' => 'recently_viewed_product-block_1',
+    'module' => 'views',
+    'node_types' => array(
+      0 => 'product_display',
+    ),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => 'content',
+        'status' => 1,
+        'theme' => 'stepug',
+        'weight' => -18,
+      ),
+    ),
+    'title' => '',
+    'visibility' => 0,
+  );
+
+  $export['views-recently_viewed_product-block_2'] = array(
+    'cache' => -1,
+    'custom' => 0,
+    'delta' => 'recently_viewed_product-block_2',
+    'module' => 'views',
+    'node_types' => array(
+      0 => 'article',
+      1 => 'page',
+      2 => 'webform',
+    ),
+    'pages' => '',
+    'roles' => array(),
+    'themes' => array(
+      'omega' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'omega',
+        'weight' => 0,
+      ),
+      'seven' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'seven',
+        'weight' => 0,
+      ),
+      'stepug' => array(
+        'region' => '',
+        'status' => 0,
+        'theme' => 'stepug',
+        'weight' => -17,
       ),
     ),
     'title' => '',

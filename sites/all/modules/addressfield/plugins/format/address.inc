@@ -38,10 +38,10 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#tag' => 'div',
     '#attributes' => array(
       'class' => array('thoroughfare'),
-      'x-autocompletetype' => 'address-line1',
       'autocomplete' => 'address-line1',
     ),
     '#size' => 30,
+    '#maxlength' => 255,
     '#required' => TRUE,
   );
   $format['street_block']['premise'] = array(
@@ -49,10 +49,10 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#tag' => 'div',
     '#attributes' => array(
       'class' => array('premise'),
-      'x-autocompletetype' => 'address-line2',
       'autocomplete' => 'address-line2',
     ),
     '#size' => 30,
+    '#maxlength' => 255,
   );
   $format['locality_block'] = array(
     '#type' => 'addressfield_container',
@@ -60,6 +60,7 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
       'class' => array('addressfield-container-inline', 'locality-block', 'country-' . $address['country']),
     ),
     '#weight' => 50,
+    '#maxlength' => 255,
   );
   $format['locality_block']['#attached']['css'][] = drupal_get_path('module', 'addressfield') . '/addressfield.css';
   $format['locality_block']['postal_code'] = array(
@@ -67,9 +68,9 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#required' => in_array('postal_code', $address_format['required_fields']),
     '#access' => in_array('postal_code', $address_format['used_fields']),
     '#size' => 10,
+    '#maxlength' => 255,
     '#attributes' => array(
       'class' => array('postal-code'),
-      'x-autocompletetype' => 'postal-code',
       'autocomplete' => 'postal-code',
     ),
   );
@@ -78,9 +79,11 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#required' => in_array('dependent_locality', $address_format['required_fields']),
     '#access' => in_array('dependent_locality', $address_format['used_fields']),
     '#size' => 25,
+    '#maxlength' => 255,
     '#tag' => 'div',
     '#attributes' => array(
-      'class' => array('dependent-locality')
+      'class' => array('dependent-locality'),
+      'autocomplete' => '"address-level3',
     ),
     // Most formats place this field in its own row.
     '#suffix' => $clearfix,
@@ -90,11 +93,11 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#required' => in_array('locality', $address_format['required_fields']),
     '#access' => in_array('locality', $address_format['used_fields']),
     '#size' => 30,
+    '#maxlength' => 255,
     '#prefix' => ' ',
     '#attributes' => array(
       'class' => array('locality'),
-      'x-autocompletetype' => 'locality',
-      'autocomplete' => 'locality',
+      'autocomplete' => '"address-level2',
     ),
   );
   $format['locality_block']['administrative_area'] = array(
@@ -103,11 +106,12 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#access' => in_array('administrative_area', $address_format['used_fields']),
     '#empty_value' => '',
     '#size' => 10,
+    '#maxlength' => 255,
     '#prefix' => ' ',
+    '#render_option_value' => $address_format['render_administrative_area_value'],
     '#attributes' => array(
       'class' => array('state'),
-      'x-autocompletetype' => 'region',
-      'autocomplete' => 'region',
+      'autocomplete' => 'address-level1',
     ),
   );
   $format['country'] = array(
@@ -117,7 +121,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     '#required' => TRUE,
     '#attributes' => array(
       'class' => array('country'),
-      'x-autocompletetype' => 'country',
       'autocomplete' => 'country',
     ),
     '#weight' => 100,
@@ -138,7 +141,7 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
   }
 
   // Country-specific customizations.
-  if (in_array($address['country'], array('AU', 'NZ', 'RU'))) {
+  if (in_array($address['country'], array('AU', 'EE', 'LT', 'LV', 'NZ', 'RU'))) {
     // These countries don't use the "Address 2" line.
     // Leave it as a precaution, but hide the label to avoid confusing users.
     $format['street_block']['thoroughfare']['#title'] = t('Address');
@@ -152,7 +155,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
   elseif ($address['country'] == 'BR') {
     $format['locality_block']['dependent_locality']['#suffix'] = $clearfix;
     $format['locality_block']['dependent_locality']['#tag'] = 'div';
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['administrative_area']['#suffix'] = $clearfix;
     $format['locality_block']['postal_code']['#tag'] = 'div';
     // Change some titles to make translation easier.
@@ -166,6 +168,7 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
       '#tag' => NULL,
       '#attributes' => array('class' => array('premise')),
       '#size' => 20,
+      '#maxlength' => 255,
       '#prefix' => ', ',
     );
     $format['locality_block']['locality']['#suffix'] = ' - ';
@@ -188,7 +191,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     $format['locality_block']['administrative_area']['#size'] = '30';
   }
   elseif ($address['country'] == 'ID') {
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['administrative_area']['#weight'] = 1;
   }
   elseif ($address['country'] == 'JP') {
@@ -198,7 +200,6 @@ function addressfield_format_address_generate(&$format, $address, $context = arr
     $format['locality_block']['postal_code']['#size'] = 30;
     $format['locality_block']['administrative_area']['#weight'] = 20;
     $format['locality_block']['administrative_area']['#size'] = 30;
-    $format['locality_block']['administrative_area']['#render_option_value'] = TRUE;
     $format['locality_block']['locality']['#weight'] = 30;
     $format['street_block']['#weight'] = 20;
   }

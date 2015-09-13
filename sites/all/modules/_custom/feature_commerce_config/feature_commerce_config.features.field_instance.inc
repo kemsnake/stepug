@@ -10,21 +10,11 @@
 function feature_commerce_config_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'commerce_customer_profile-shipping-commerce_customer_address'
+  // Exported field_instance:
+  // 'commerce_customer_profile-shipping-commerce_customer_address'
   $field_instances['commerce_customer_profile-shipping-commerce_customer_address'] = array(
     'bundle' => 'shipping',
-    'default_value' => array(
-      0 => array(
-        'element_key' => 'commerce_customer_profile|shipping|commerce_customer_address|und|0',
-        'thoroughfare' => '',
-        'premise' => '',
-        'postal_code' => '',
-        'locality' => '',
-        'administrative_area' => '',
-        'country' => 'RU',
-        'name_line' => '',
-      ),
-    ),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -79,17 +69,56 @@ function feature_commerce_config_field_default_field_instances() {
         'available_countries' => array(
           'RU' => 'RU',
         ),
+        'default_country' => 'RU',
         'format_handlers' => array(
           'address_ru' => 'address_ru',
-          'name-full' => 'name-full',
+          'name-oneline' => 'name-oneline',
+          'address-optional' => 'address-optional',
           'address' => 0,
+          'address-hide-postal-code' => 0,
+          'address-hide-street' => 0,
           'address-hide-country' => 0,
           'organisation' => 0,
-          'name-oneline' => 0,
+          'name-full' => 0,
         ),
       ),
       'type' => 'addressfield_standard',
       'weight' => -10,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'commerce_customer_profile-shipping-field_order_comment'
+  $field_instances['commerce_customer_profile-shipping-field_order_comment'] = array(
+    'bundle' => 'shipping',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => -9,
+      ),
+    ),
+    'entity_type' => 'commerce_customer_profile',
+    'field_name' => 'field_order_comment',
+    'label' => 'Комментарий',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 2,
+      ),
+      'type' => 'text_textarea',
+      'weight' => -9,
     ),
   );
 
@@ -310,7 +339,8 @@ function feature_commerce_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_line_item-shipping-commerce_shipping_service'
+  // Exported field_instance:
+  // 'commerce_line_item-shipping-commerce_shipping_service'
   $field_instances['commerce_line_item-shipping-commerce_shipping_service'] = array(
     'bundle' => 'shipping',
     'default_value' => NULL,
@@ -487,7 +517,8 @@ function feature_commerce_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_order-commerce_order-commerce_customer_billing'
+  // Exported field_instance:
+  // 'commerce_order-commerce_order-commerce_customer_billing'
   $field_instances['commerce_order-commerce_order-commerce_customer_billing'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -508,11 +539,16 @@ function feature_commerce_config_field_default_field_instances() {
         'weight' => -5,
       ),
       'default' => array(
-        'label' => 'above',
-        'module' => 'commerce_customer',
+        'label' => 'hidden',
         'settings' => array(),
-        'type' => 'commerce_customer_profile_reference_display',
+        'type' => 'hidden',
         'weight' => -5,
+      ),
+      'invoice' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
     ),
     'entity_type' => 'commerce_order',
@@ -530,7 +566,8 @@ function feature_commerce_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_order-commerce_order-commerce_customer_shipping'
+  // Exported field_instance:
+  // 'commerce_order-commerce_order-commerce_customer_shipping'
   $field_instances['commerce_order-commerce_order-commerce_customer_shipping'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -552,9 +589,17 @@ function feature_commerce_config_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
+        'module' => 'commerce_customer',
         'settings' => array(),
-        'type' => 'hidden',
+        'type' => 'commerce_customer_profile_reference_display',
         'weight' => -5,
+      ),
+      'invoice' => array(
+        'label' => 'above',
+        'module' => 'commerce_customer',
+        'settings' => array(),
+        'type' => 'commerce_customer_profile_reference_display',
+        'weight' => 2,
       ),
     ),
     'entity_type' => 'commerce_order',
@@ -572,7 +617,8 @@ function feature_commerce_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_order-commerce_order-commerce_line_items'
+  // Exported field_instance:
+  // 'commerce_order-commerce_order-commerce_line_items'
   $field_instances['commerce_order-commerce_order-commerce_line_items'] = array(
     'bundle' => 'commerce_order',
     'deleted' => 0,
@@ -605,6 +651,15 @@ function feature_commerce_config_field_default_field_instances() {
         'type' => 'commerce_line_item_reference_view',
         'weight' => -10,
       ),
+      'invoice' => array(
+        'label' => 'above',
+        'module' => 'commerce_line_item',
+        'settings' => array(
+          'view' => 'commerce_line_item_table|default',
+        ),
+        'type' => 'commerce_line_item_reference_view',
+        'weight' => 0,
+      ),
     ),
     'entity_type' => 'commerce_order',
     'field_name' => 'commerce_line_items',
@@ -621,7 +676,8 @@ function feature_commerce_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_order-commerce_order-commerce_order_total'
+  // Exported field_instance:
+  // 'commerce_order-commerce_order-commerce_order_total'
   $field_instances['commerce_order-commerce_order-commerce_order_total'] = array(
     'bundle' => 'commerce_order',
     'default_value' => NULL,
@@ -654,6 +710,15 @@ function feature_commerce_config_field_default_field_instances() {
         ),
         'type' => 'commerce_price_formatted_components',
         'weight' => -8,
+      ),
+      'invoice' => array(
+        'label' => 'inline',
+        'module' => 'commerce_price',
+        'settings' => array(
+          'calculation' => FALSE,
+        ),
+        'type' => 'commerce_price_formatted_amount',
+        'weight' => 1,
       ),
       'node_teaser' => array(
         'label' => 'hidden',
@@ -698,12 +763,24 @@ function feature_commerce_config_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
-      'default' => array(
+      'customer' => array(
         'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
         'weight' => -4,
+      ),
+      'invoice' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
     ),
     'entity_type' => 'commerce_order',
@@ -734,11 +811,17 @@ function feature_commerce_config_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'commerce_price',
+        'module' => 'commerce_extra_price_formatters',
         'settings' => array(
-          'calculation' => 'calculated_sell_price',
+          'calculation' => TRUE,
+          'check_for_same_price' => 1,
+          'include_tax_in_rrp' => 1,
+          'offer_label' => '',
+          'rrp_label' => '',
+          'saving_label' => '',
+          'show_saving' => 0,
         ),
-        'type' => 'commerce_price_formatted_amount',
+        'type' => 'commerce_price_rrp_your_price',
         'weight' => 3,
       ),
       'full' => array(
@@ -814,7 +897,7 @@ function feature_commerce_config_field_default_field_instances() {
           'thousand_separator' => ' ',
         ),
         'type' => 'number_decimal',
-        'weight' => 7,
+        'weight' => 10,
       ),
       'line_item' => array(
         'label' => 'above',
@@ -845,7 +928,49 @@ function feature_commerce_config_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 8,
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-product_display-field_is_new'
+  $field_instances['node-product_display-field_is_new'] = array(
+    'bundle' => 'product_display',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_is_new',
+    'label' => 'Новинка',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 31,
     ),
   );
 
@@ -863,6 +988,8 @@ function feature_commerce_config_field_default_field_instances() {
   t('Адрес');
   t('В наличии');
   t('Итого');
+  t('Комментарий');
+  t('Новинка');
   t('Почтовый код');
   t('Цена');
 

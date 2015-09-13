@@ -56,6 +56,58 @@ function hook_search_api_autocomplete_types() {
 }
 
 /**
+ * Add new plugins for calculating autocomplete suggestions.
+ *
+ * @return array
+ *   An array of suggester plugin definitions, keyed by plugin ID (should be
+ *   unique, and thus be prefixed with your module's name). Each definition is
+ *   an associative array with the following keys:
+ *   - label: The human-readable, translated label of the plugin.
+ *   - description: (optional) A translated text describing the plugin in a bit
+ *     more detail.
+ *   - class: The plugin class. Must implement
+ *     SearchApiAutocompleteSuggesterInterface.
+ *   Additional keys will be retained and passed to the plugin as part of its
+ *   definition upon creation.
+ *
+ * @see SearchApiAutocompleteSuggesterInterface
+ * @see SearchApiAutocompleteSuggesterPluginBase
+ * @see hook_search_api_autocomplete_suggester_info_alter()
+ */
+function hook_search_api_autocomplete_suggester_info() {
+  // Source: search_api_autocomplete_search_api_autocomplete_suggester_info().
+  $suggesters['server'] = array(
+    'label' => t('Retrieve from server'),
+    'description' => t('For compatible servers, ask the server for autocomplete suggestions.'),
+    'class' => 'SearchApiAutocompleteServerSuggester',
+  );
+
+  return $suggesters;
+}
+
+/**
+ * Alter the plugins available for calculating autocomplete suggestions.
+ *
+ * @param array $suggesters
+ *   An array of suggester plugin definitions, keyed by plugin ID (should be
+ *   unique, and thus be prefixed with your module's name). Each definition is
+ *   an associative array with the following keys (and possibly others):
+ *   - label: The human-readable, translated label of the plugin.
+ *   - description: (optional) A translated text describing the plugin in a bit
+ *     more detail.
+ *   - class: The plugin class. Must implement
+ *     SearchApiAutocompleteSuggesterInterface.
+ *
+ * @see hook_search_api_autocomplete_suggester_info()
+ */
+function hook_search_api_autocomplete_suggester_info_alter(array &$suggesters) {
+  if (isset($suggesters['foobar'])) {
+    $suggesters['foobar']['my_custom_override_previous'] = $suggesters['foobar']['class'];
+    $suggesters['foobar']['class'] = 'MyCustomOverrideSuggester';
+  }
+}
+
+/**
  * Acts on searches being loaded from the database.
  *
  * This hook is invoked during search loading, which is handled by
@@ -67,9 +119,9 @@ function hook_search_api_autocomplete_types() {
  * @see hook_entity_load()
  */
 function hook_search_api_autocomplete_search_load(array $searches) {
-  $result = db_query('SELECT pid, foo FROM {mytable} WHERE pid IN(:ids)', array(':ids' => array_keys($entities)));
+  $result = db_query('SELECT pid, foo FROM {mytable} WHERE pid IN(:ids)', array(':ids' => array_keys($searches)));
   foreach ($result as $record) {
-    $entities[$record->pid]->foo = $record->foo;
+    $searches[$record->pid]->foo = $record->foo;
   }
 }
 
@@ -181,6 +233,21 @@ function hook_default_search_api_autocomplete_search_alter(array &$defaults) {
 function hook_search_api_autocomplete_suggestions_alter(array &$suggestions, array $context) {
   // Sort suggestions in alphabetical order.
   ksort($suggestions);
+}
+
+/**
+ * Alter the list of detected fulltext fields for autocompletion in a view.
+ *
+ * @param string[] $fields
+ *   The machine names of the detected fulltext fields.
+ * @param SearchApiAutocompleteSearch $search
+ *   The related search autocomplete object.
+ * @param view $view
+ *   The view for which fulltext fields should be determined.
+ */
+function hook_search_api_autocomplete_views_fulltext_fields_alter(array &$fields, SearchApiAutocompleteSearch $search, view $view) {
+  // Add a new field.
+  $fields[] = 'extra_search_api_views_fulltext';
 }
 
 /**
@@ -380,4 +447,39 @@ function example_search_api_query_alter(SearchApiQueryInterface $query) {
     global $user;
     $query->condition('group', $user->data['group']);
   }
+}
+
+/**
+ * Returns the URL to use for a custom script.
+ *
+ * @param SearchApiAutocompleteSearch $search
+ *   The autocomplete search in question.
+ * @param array $element
+ *   The form element for which autocompletion is being added.
+ * @param array $config
+ *   The complete array set for this search in the
+ *   "search_api_autocomplete_scripts" variable.
+ *
+ * @return string
+ *   A valid relative or absolute URL, as returned by url().
+ *
+ * @ingroup callbacks
+ */
+function callback_search_api_autocomplete_script_url(SearchApiAutocompleteSearch $search, array $element, array $config) {
+  // Solution to use a custom script on multilingual sites which have the
+  // current language as the first path element.
+  global $language;
+  $options = array(
+    'absolute' => TRUE,
+    // Don't prefix the path with the language, always point to the root
+    // directory. Instead we pass the language as a GET parameter.
+    'language' => (object) array(
+      'language' => '',
+    ),
+    'query' => array(
+      'machine_name' => $search->machine_name,
+      'language' => $language->language,
+    ),
+  );
+  return url($config['#url'], $options);
 }

@@ -19,14 +19,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'comment',
     ),
     'field_name' => 'comment_body',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -48,7 +40,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_customer_profile',
     ),
     'field_name' => 'commerce_customer_address',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'addressfield',
@@ -66,14 +57,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_order',
     ),
     'field_name' => 'commerce_customer_billing',
-    'foreign keys' => array(
-      'profile_id' => array(
-        'columns' => array(
-          'profile_id' => 'profile_id',
-        ),
-        'table' => 'commerce_customer_profile',
-      ),
-    ),
     'indexes' => array(
       'profile_id' => array(
         0 => 'profile_id',
@@ -98,14 +81,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_order',
     ),
     'field_name' => 'commerce_customer_shipping',
-    'foreign keys' => array(
-      'profile_id' => array(
-        'columns' => array(
-          'profile_id' => 'profile_id',
-        ),
-        'table' => 'commerce_customer_profile',
-      ),
-    ),
     'indexes' => array(
       'profile_id' => array(
         0 => 'profile_id',
@@ -130,14 +105,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_line_item',
     ),
     'field_name' => 'commerce_display_path',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -161,14 +128,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_order',
     ),
     'field_name' => 'commerce_line_items',
-    'foreign keys' => array(
-      'line_item_id' => array(
-        'columns' => array(
-          'line_item_id' => 'line_item_id',
-        ),
-        'table' => 'commerce_line_item',
-      ),
-    ),
     'indexes' => array(
       'line_item_id' => array(
         0 => 'line_item_id',
@@ -190,7 +149,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_order',
     ),
     'field_name' => 'commerce_order_total',
-    'foreign keys' => array(),
     'indexes' => array(
       'currency_price' => array(
         0 => 'amount',
@@ -213,7 +171,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_product',
     ),
     'field_name' => 'commerce_price',
-    'foreign keys' => array(),
     'indexes' => array(
       'currency_price' => array(
         0 => 'amount',
@@ -236,14 +193,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_line_item',
     ),
     'field_name' => 'commerce_product',
-    'foreign keys' => array(
-      'product_id' => array(
-        'columns' => array(
-          'product_id' => 'product_id',
-        ),
-        'table' => 'commerce_product',
-      ),
-    ),
     'indexes' => array(
       'product_id' => array(
         0 => 'product_id',
@@ -267,7 +216,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_line_item',
     ),
     'field_name' => 'commerce_shipping_service',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -292,7 +240,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_product',
     ),
     'field_name' => 'commerce_stock',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'number',
@@ -314,7 +261,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_line_item',
     ),
     'field_name' => 'commerce_total',
-    'foreign keys' => array(),
     'indexes' => array(
       'currency_price' => array(
         0 => 'amount',
@@ -337,7 +283,6 @@ function feature_commerce_config_field_default_field_bases() {
       0 => 'commerce_line_item',
     ),
     'field_name' => 'commerce_unit_price',
-    'foreign keys' => array(),
     'indexes' => array(
       'currency_price' => array(
         0 => 'amount',
@@ -351,6 +296,76 @@ function feature_commerce_config_field_default_field_bases() {
     'type' => 'commerce_price',
   );
 
+  // Exported field_base: 'field_country'
+  $field_bases['field_country'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_country',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'countries',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_is_new'
+  $field_bases['field_is_new'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_is_new',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
+  // Exported field_base: 'field_order_comment'
+  $field_bases['field_order_comment'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_order_comment',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_long',
+  );
+
   // Exported field_base: 'field_track_code'
   $field_bases['field_track_code'] = array(
     'active' => 1,
@@ -358,14 +373,6 @@ function feature_commerce_config_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_track_code',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -378,6 +385,32 @@ function feature_commerce_config_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'text',
+  );
+
+  // Exported field_base: 'field_vendors'
+  $field_bases['field_vendors'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_vendors',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'vendors',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
   );
 
   return $field_bases;

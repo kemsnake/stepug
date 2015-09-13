@@ -87,6 +87,11 @@ function custom_stepug_format_address_generate(&$format, $address, $context = ar
     '#weight' => 2,
   );
 
+  $format['locality_block']['dependent_locality'] = array(
+    '#type' => 'hidden',
+    '#access' => FALSE,
+  );
+
   $format['country'] = array(
     '#access' => FALSE,
     '#title' => t('Country'),

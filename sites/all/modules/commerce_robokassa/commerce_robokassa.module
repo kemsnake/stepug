@@ -108,7 +108,7 @@ function commerce_robokassa_build_redirect_form($form, &$form_state, $order, $se
   $form["InvId"] = array('#type' => 'hidden', '#value' => $order->order_id);
   global $user;
   if (isset($user->mail)) {
-    $form["sEmail"] = $user->mail;
+    $form["sEmail"] = array('#type' => 'hidden', '#value' => $user->mail);
   }
   // Calculate signature.
   $form["SignatureValue"] = array(

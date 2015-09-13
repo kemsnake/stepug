@@ -50,8 +50,8 @@ function phpexcel_libraries_info() {
       'download url' => 'https://github.com/PHPOffice/PHPExcel',
       'version arguments' => array(
         'file' => 'changelog.txt',
-        'pattern' => "/@version\s+([0-9\.]+)/",
-        'lines' => 25,
+        'pattern' => "/(\d{4}-\d{2}-\d{2}\s+\(v([0-9\.]+)|@version\s+([0-9\.]+))/",
+        'lines' => 300,
       ),
       'path' => 'Classes',
       'files' => array(

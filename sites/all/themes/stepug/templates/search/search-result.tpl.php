@@ -64,7 +64,7 @@
  * @ingroup themeable
  */
 ?>
-<article class="search-result <?php print $classes; ?>"<?php print $attributes; ?>>
+<article class="search-result col-xs-12 col-sm-6 col-md-4 col-lg-3 <?php print $classes; ?>"<?php print $attributes; ?>>
 
   <?php if ($product_photo): ?>
     <div class="field-product-photo"><a href="<?php print $url; ?>"><?php print $product_photo; ?></a></div>

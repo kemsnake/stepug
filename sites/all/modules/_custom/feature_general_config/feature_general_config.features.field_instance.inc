@@ -10,22 +10,11 @@
 function feature_general_config_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'commerce_customer_profile-billing-commerce_customer_address'
+  // Exported field_instance:
+  // 'commerce_customer_profile-billing-commerce_customer_address'
   $field_instances['commerce_customer_profile-billing-commerce_customer_address'] = array(
     'bundle' => 'billing',
-    'default_value' => array(
-      0 => array(
-        'element_key' => 'commerce_customer_profile|billing|commerce_customer_address|und|0',
-        'thoroughfare' => '',
-        'premise' => '',
-        'postal_code' => '',
-        'locality' => '',
-        'administrative_area' => '',
-        'country' => 'RU',
-        'first_name' => '',
-        'last_name' => '',
-      ),
-    ),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -78,6 +67,7 @@ function feature_general_config_field_default_field_instances() {
       'module' => 'addressfield',
       'settings' => array(
         'available_countries' => array(),
+        'default_country' => NULL,
         'format_handlers' => array(
           'address_ru' => 'address_ru',
           'name-full' => 'name-full',
@@ -143,7 +133,8 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_product-product-field_field_product_photo'
+  // Exported field_instance:
+  // 'commerce_product-product-field_field_product_photo'
   $field_instances['commerce_product-product-field_field_product_photo'] = array(
     'bundle' => 'product',
     'deleted' => 0,
@@ -501,7 +492,7 @@ function feature_general_config_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'hidden',

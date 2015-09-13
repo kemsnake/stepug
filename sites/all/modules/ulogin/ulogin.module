@@ -337,12 +337,14 @@ function theme_ulogin_widget($variables) {
  * Implements hook_username_alter().
  */
 function ulogin_username_alter(&$name, $account) {
-  $account2 = user_load($account->uid);
-  if (!empty($account2->data['ulogin']) && !module_exists('realname')) {
-    $ulogin_pattern = variable_get('ulogin_display_name', '[user:ulogin:first_name] [user:ulogin:last_name]');
-    $pattern = str_replace('[user:name]', $account2->name, $ulogin_pattern);
-    $ulogin_name = token_replace($pattern, array('user' => $account2), array('clear' => TRUE));
-    $name = trim(strip_tags($ulogin_name));
+  if (!is_null($account->uid)) {
+    $account2 = user_load($account->uid);
+    if (!empty($account2->data['ulogin']) && !module_exists('realname')) {
+      $ulogin_pattern = variable_get('ulogin_display_name', '[user:ulogin:first_name] [user:ulogin:last_name]');
+      $pattern = str_replace('[user:name]', $account2->name, $ulogin_pattern);
+      $ulogin_name = token_replace($pattern, array('user' => $account2), array('clear' => TRUE));
+      $name = trim(strip_tags($ulogin_name));
+    }
   }
 }
 

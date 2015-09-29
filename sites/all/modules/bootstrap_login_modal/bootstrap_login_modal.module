@@ -54,7 +54,7 @@ function bootstrap_login_modal_block_view($delta = '') {
  * Theme function for the modal.
  */
 function theme_bootstrap_login_modal_output($vars) {
-  $links = '<ul class="menu nav navbar-nav pull-right"><li><a href="#" data-toggle="modal" data-target="#login-modal">' . t('Login') . '</a></li>';
+  $links = '<ul class="menu nav navbar-nav pull-right"><li><a href="#" data-toggle="modal" data-target="#login-modal">' . t('Log in') . '</a></li>';
   // Login modal.
   $login_form = drupal_get_form('user_login');
   $login_modal = '

@@ -41,8 +41,8 @@ class FeedsCommerceProductProcessor extends FeedsProcessor {
    * Loads an existing product.
    */
   protected function entityLoad(FeedsSource $source, $product_id) {
+    $product = parent::entityLoad($source, $product_id);
     if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
-      $product = commerce_product_load($product_id);
       $product->log = 'Updated by FeedsCommerceProductProcessor';
     }
     else {
@@ -126,10 +126,6 @@ class FeedsCommerceProductProcessor extends FeedsProcessor {
         '#default_value' => !empty($this->config['tax_rate']) ? $this->config['tax_rate'] : '',
       );
     }
-    $form['update_existing']['#options'] = array(
-      FEEDS_SKIP_EXISTING => 'Do not update existing products',
-      FEEDS_UPDATE_EXISTING => 'Update existing products',
-    );
     return $form;
   }
 
@@ -151,6 +147,11 @@ class FeedsCommerceProductProcessor extends FeedsProcessor {
   public function getMappingTargets() {
     $targets = parent::getMappingTargets();
     $targets += array(
+      'product_id' => array(
+        'name' => t('Product ID'),
+        'description' => t('The id of the product. NOTE: use this feature with care, product ids are usually assigned by Drupal Commerce.'),
+        'optional_unique' => TRUE,
+      ),
       'sku' => array(
         'name' => t('Product SKU'),
         'description' => t('The product identifier. Must be unique.'),
@@ -169,13 +170,13 @@ class FeedsCommerceProductProcessor extends FeedsProcessor {
         'description' => t('The Drupal user ID of the product owner.'),
       ),
     );
-    // Let implementers of hook_feeds_term_processor_targets() add their targets.
-    try {
-      self::loadMappers();
-      feeds_alter('feeds_processor_targets', $targets, 'commerce_product', $this->config['product_type']);
-    } catch (Exception $e) {
-      // Do nothing.
-    }
+
+    // Let other modules expose mapping targets.
+    self::loadMappers();
+    $entity_type = $this->entityType();
+    $bundle = $this->config['product_type'];
+    drupal_alter('feeds_processor_targets', $targets, $entity_type, $bundle);
+
     return $targets;
   }
 

@@ -40,8 +40,8 @@ class FeedsCommerceCustomerProfileProcessor extends FeedsProcessor {
    * Loads an existing profile.
    */
   protected function entityLoad(FeedsSource $source, $profile_id) {
+    $profile = parent::entityLoad($source, $profile_id);
     if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
-      $profile = commerce_customer_profile_load($profile_id);
       $profile->log = 'Updated by FeedsCommerceProfileProcessor';
     }
     else {
@@ -90,10 +90,6 @@ class FeedsCommerceCustomerProfileProcessor extends FeedsProcessor {
       '#options' => $types,
       '#default_value' => $this->config['customer_profile_type'],
     );
-    $form['update_existing']['#options'] = array(
-      FEEDS_SKIP_EXISTING => 'Do not update existing profiles',
-      FEEDS_UPDATE_EXISTING => 'Update existing profiles',
-    );
     return $form;
   }
 
@@ -116,13 +112,13 @@ class FeedsCommerceCustomerProfileProcessor extends FeedsProcessor {
         'description' => t('Commerce profile type, if not specified the default one will be used.'),
       ),
     );
-    // Let implementers of hook_feeds_term_processor_targets() add their targets.
-    try {
-      self::loadMappers();
-      feeds_alter('feeds_processor_targets', $targets, 'commerce_customer_profile', $this->config['customer_profile_type']);
-    } catch (Exception $e) {
-      // Do nothing.
-    }
+
+    // Let other modules expose mapping targets.
+    self::loadMappers();
+    $entity_type = $this->entityType();
+    $bundle = $this->config['customer_profile_type'];
+    drupal_alter('feeds_processor_targets', $targets, $entity_type, $bundle);
+
     return $targets;
   }
 

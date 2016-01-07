@@ -40,8 +40,8 @@ class FeedsCommerceCouponProcessor extends FeedsProcessor {
    * Loads an existing coupon.
    */
   protected function entityLoad(FeedsSource $source, $coupon_id) {
+    $coupon = parent::entityLoad($source, $coupon_id);
     if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
-      $coupon = commerce_coupon_load($coupon_id);
       $coupon->log = 'Updated by FeedsCommerceCouponProcessor';
     }
     else {
@@ -106,13 +106,11 @@ class FeedsCommerceCouponProcessor extends FeedsProcessor {
   public function getMappingTargets() {
     $targets = parent::getMappingTargets();
 
-    // Let implementers of hook_feeds_term_processor_targets() add their targets.
-    try {
-      self::loadMappers();
-      feeds_alter('feeds_processor_targets', $targets, 'commerce_coupon', $this->config['coupon_type']);
-    } catch (Exception $e) {
-      // Do nothing.
-    }
+    // Let other modules expose mapping targets.
+    self::loadMappers();
+    $entity_type = $this->entityType();
+    $bundle = $this->config['coupon_type'];
+    drupal_alter('feeds_processor_targets', $targets, $entity_type, $bundle);
 
     return $targets;
   }

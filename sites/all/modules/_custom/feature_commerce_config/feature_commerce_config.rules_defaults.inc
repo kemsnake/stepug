@@ -9,6 +9,25 @@
  */
 function feature_commerce_config_default_rules_configuration() {
   $items = array();
+  $items['commerce_checkout_admin_email_order_notify'] = entity_import('rules_config', '{ "commerce_checkout_admin_email_order_notify" : {
+      "LABEL" : "[Admin] \\u041e\\u0442\\u043f\\u0440\\u0430\\u0432\\u0438\\u0442\\u044c \\u0443\\u0432\\u0435\\u0434\\u043e\\u043c\\u043b\\u0435\\u043d\\u0438\\u0435 \\u043e \\u0437\\u0430\\u043a\\u0430\\u0437\\u0435 \\u043d\\u0430 e-mail",
+      "PLUGIN" : "reaction rule",
+      "WEIGHT" : "4",
+      "OWNER" : "rules",
+      "TAGS" : [ "Commerce Checkout" ],
+      "REQUIRES" : [ "rules", "commerce_checkout" ],
+      "ON" : { "commerce_checkout_complete" : [] },
+      "DO" : [
+        { "mail" : {
+            "to" : "kemsnake@yandex.ru,dotta@yandex.ru",
+            "subject" : "\\u041d\\u043e\\u0432\\u044b\\u0439 \\u0437\\u0430\\u043a\\u0430\\u0437 \\u043d\\u0430 \\u0441\\u0430\\u0439\\u0442\\u0435 \\u0421\\u0442\\u0435\\u0436\\u043a\\u043e\\u0432 \\u0438 \\u041f\\u0443\\u0433\\u043e\\u0432\\u043a\\u0438\\u043d",
+            "message" : "\\u0421\\u043e\\u0437\\u0434\\u0430\\u043d \\u0437\\u0430\\u043a\\u0430\\u0437 \\u043d\\u043e\\u043c\\u0435\\u0440 [commerce-order:order-number]\\r\\n\\u0414\\u0435\\u0442\\u0430\\u043b\\u0438 \\u0437\\u0430\\u043a\\u0430\\u0437\\u0430\\r\\n[commerce-order:email-order]",
+            "language" : [ "commerce-order:state" ]
+          }
+        }
+      ]
+    }
+  }');
   $items['commerce_checkout_custom_create_user_from_order'] = entity_import('rules_config', '{ "commerce_checkout_custom_create_user_from_order" : {
       "LABEL" : "\\u0421\\u043e\\u0437\\u0434\\u0430\\u043d\\u0438\\u0435 \\u043d\\u043e\\u0432\\u043e\\u0439 \\u0443\\u0447\\u0451\\u0442\\u043d\\u043e\\u0439 \\u0437\\u0430\\u043f\\u0438\\u0441\\u0438 \\u0434\\u043b\\u044f \\u0430\\u043d\\u043e\\u043d\\u0438\\u043c\\u043d\\u043e\\u0433\\u043e \\u0437\\u0430\\u043a\\u0430\\u0437\\u0430 (cloned)",
       "PLUGIN" : "reaction rule",

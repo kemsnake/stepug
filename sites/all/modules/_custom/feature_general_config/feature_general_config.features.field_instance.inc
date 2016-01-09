@@ -11,7 +11,7 @@ function feature_general_config_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
-  // 'commerce_customer_profile-billing-commerce_customer_address'
+  // 'commerce_customer_profile-billing-commerce_customer_address'.
   $field_instances['commerce_customer_profile-billing-commerce_customer_address'] = array(
     'bundle' => 'billing',
     'default_value' => NULL,
@@ -82,7 +82,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_product-product-field_color'
+  // Exported field_instance: 'commerce_product-product-field_color'.
   $field_instances['commerce_product-product-field_color'] = array(
     'bundle' => 'product',
     'commerce_cart_settings' => array(
@@ -134,7 +134,7 @@ function feature_general_config_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'commerce_product-product-field_field_product_photo'
+  // 'commerce_product-product-field_field_product_photo'.
   $field_instances['commerce_product-product-field_field_product_photo'] = array(
     'bundle' => 'product',
     'deleted' => 0,
@@ -205,7 +205,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_product-product-field_measurement'
+  // Exported field_instance: 'commerce_product-product-field_measurement'.
   $field_instances['commerce_product-product-field_measurement'] = array(
     'bundle' => 'product',
     'commerce_cart_settings' => array(
@@ -256,7 +256,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'commerce_product-product-field_size'
+  // Exported field_instance: 'commerce_product-product-field_size'.
   $field_instances['commerce_product-product-field_size'] = array(
     'bundle' => 'product',
     'default_value' => NULL,
@@ -302,7 +302,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-body'
+  // Exported field_instance: 'node-article-body'.
   $field_instances['node-article-body'] = array(
     'bundle' => 'article',
     'default_value' => NULL,
@@ -346,7 +346,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-field_added_to_article_list'
+  // Exported field_instance: 'node-article-field_added_to_article_list'.
   $field_instances['node-article-field_added_to_article_list'] = array(
     'bundle' => 'article',
     'default_value' => array(
@@ -388,7 +388,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-field_image'
+  // Exported field_instance: 'node-article-field_image'.
   $field_instances['node-article-field_image'] = array(
     'bundle' => 'article',
     'deleted' => 0,
@@ -441,7 +441,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-article-field_tags'
+  // Exported field_instance: 'node-article-field_tags'.
   $field_instances['node-article-field_tags'] = array(
     'bundle' => 'article',
     'default_value' => NULL,
@@ -480,7 +480,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-product_display-body'
+  // Exported field_instance: 'node-product_display-body'.
   $field_instances['node-product_display-body'] = array(
     'bundle' => 'product_display',
     'default_value' => NULL,
@@ -525,7 +525,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-product_display-field_category'
+  // Exported field_instance: 'node-product_display-field_category'.
   $field_instances['node-product_display-field_category'] = array(
     'bundle' => 'product_display',
     'default_value' => NULL,
@@ -565,7 +565,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-product_display-field_product'
+  // Exported field_instance: 'node-product_display-field_product'.
   $field_instances['node-product_display-field_product'] = array(
     'bundle' => 'product_display',
     'default_value' => NULL,
@@ -616,7 +616,7 @@ function feature_general_config_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'taxonomy_term-category-field_image'
+  // Exported field_instance: 'taxonomy_term-category-field_image'.
   $field_instances['taxonomy_term-category-field_image'] = array(
     'bundle' => 'category',
     'deleted' => 0,

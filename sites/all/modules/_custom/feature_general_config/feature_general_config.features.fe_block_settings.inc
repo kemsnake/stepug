@@ -77,7 +77,7 @@ function feature_general_config_default_fe_block_settings() {
   );
 
   $export['bootstrap_login_modal-bootstrap-login-modal'] = array(
-    'cache' => 4,
+    'cache' => 1,
     'custom' => 0,
     'delta' => 'bootstrap-login-modal',
     'module' => 'bootstrap_login_modal',

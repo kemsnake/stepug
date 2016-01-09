@@ -10,7 +10,7 @@
 function feature_general_config_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'body'
+  // Exported field_base: 'body'.
   $field_bases['body'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -31,7 +31,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'text_with_summary',
   );
 
-  // Exported field_base: 'field_added_to_article_list'
+  // Exported field_base: 'field_added_to_article_list'.
   $field_bases['field_added_to_article_list'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -56,7 +56,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'field_category'
+  // Exported field_base: 'field_category'.
   $field_bases['field_category'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -82,7 +82,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_color'
+  // Exported field_base: 'field_color'.
   $field_bases['field_color'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -108,7 +108,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_field_product_photo'
+  // Exported field_base: 'field_field_product_photo'.
   $field_bases['field_field_product_photo'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -130,7 +130,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'image',
   );
 
-  // Exported field_base: 'field_image'
+  // Exported field_base: 'field_image'.
   $field_bases['field_image'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -152,7 +152,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'image',
   );
 
-  // Exported field_base: 'field_measurement'
+  // Exported field_base: 'field_measurement'.
   $field_bases['field_measurement'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -178,7 +178,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_product'
+  // Exported field_base: 'field_product'.
   $field_bases['field_product'] = array(
     'active' => 1,
     'cardinality' => -1,
@@ -199,7 +199,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'commerce_product_reference',
   );
 
-  // Exported field_base: 'field_size'
+  // Exported field_base: 'field_size'.
   $field_bases['field_size'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -220,7 +220,7 @@ function feature_general_config_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_tags'
+  // Exported field_base: 'field_tags'.
   $field_bases['field_tags'] = array(
     'active' => 1,
     'cardinality' => -1,

@@ -377,9 +377,7 @@ function custom_stepug_tokens($type, $tokens, array $data = array(), array $opti
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'email-order':
-          $output = views_embed_view('order_for_email', 'block', $commerce_order->order_number);
-          watchdog('d1', '<pre>' . var_export($output,true) . '</pre>');
-          watchdog('d1', '<pre>' . var_export($commerce_order,true) . '</pre>');
+          $output = views_embed_view('order_for_email', 'block', $commerce_order->order_id);
           $replacements[$original] = $output;
           break;
       }

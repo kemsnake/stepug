@@ -352,3 +352,37 @@ function custom_stepug_entity_view($entity, $type, $view_mode, $langcode) {
     );
   }
 }
+
+/**
+ * Implements hook_token_info(). This hook will register tow token lname and fname.
+ */
+function custom_stepug_token_info() {
+  $info['tokens']['commerce-order']['email-order'] = array(
+    'name' => t('Email order'),
+    'description' => t('Order render for emails.'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens(). This hook will operate the token and replace it with it's value.
+ */
+function custom_stepug_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $commerce_order = $data['commerce-order'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'email-order':
+          $output = views_embed_view('order_for_email', 'block', $commerce_order->order_id);
+          $replacements[$original] = $output;
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}

@@ -247,7 +247,8 @@ function commerce_robokassa_result() {
         commerce_robokassa_create_transaction($payment_method, $order, $charge);
         watchdog('commerce_robokassa', 'Order #@order paid successfully.', array('@order' => $order_in), WATCHDOG_INFO);
         // Send email to admin
-        $output = views_embed_view('order_for_email', 'block', $order->order_id);
+        //$output = views_embed_view('order_for_email', 'block', $order->order_id);
+        $output = views_embed_view('order_for_email', 'block', 212);
         $my_module = 'custom_stepug';
         $from = variable_get('system_mail', 'info@stepug.ru');
         $message = array(

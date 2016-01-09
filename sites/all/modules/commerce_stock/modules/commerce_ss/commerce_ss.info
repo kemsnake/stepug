@@ -7,11 +7,12 @@ dependencies[] = commerce_order
 dependencies[] = commerce_stock
 dependencies[] = commerce_checkout
 dependencies[] = rules
+dependencies[] = list
 core = 7.x
 configure = admin/commerce/config/stock/ss
-; Information added by Drupal.org packaging script on 2014-12-11
-version = "7.x-2.1"
+; Information added by Drupal.org packaging script on 2015-10-19
+version = "7.x-2.2"
 core = "7.x"
 project = "commerce_stock"
-datestamp = "1418323685"
+datestamp = "1445253540"
 

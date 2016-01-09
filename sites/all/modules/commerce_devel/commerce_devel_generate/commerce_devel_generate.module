@@ -101,14 +101,14 @@ function commerce_devel_generate_products_form() {
   $form['min_price'] = array(
     '#title' => t('Minimum price'),
     '#type' => 'textfield',
-    '#default_value' => 0,
+    '#default_value' => 1,
     '#element_validate' => array('_commerce_devel_generate_price_validate'),
     '#size' => 10,
   );
   $form['max_price'] = array(
     '#title' => t('Maximum price'),
     '#type' => 'textfield',
-    '#default_value' => 50000,
+    '#default_value' => 500,
     '#element_validate' => array('_commerce_devel_generate_price_validate'),
     '#size' => 10,
   );
@@ -221,6 +221,20 @@ function commerce_devel_generate_orders_form() {
   $form['kill_transactions'] = array(
     '#title' => t('Delete all transactions associated with the deleted orders'),
     '#type' => 'checkbox',
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="kill_orders"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
+  $form['kill_customer_profiles'] = array(
+    '#title' => t('Delete all customer profiles associated with the deleted orders'),
+    '#type' => 'checkbox',
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="kill_orders"]' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   $form['order_statuses'] = array(
@@ -279,6 +293,11 @@ function commerce_devel_generate_orders_form() {
     '#default_value' => array_keys($methods),
     '#options' => $methods,
     '#multiple' => TRUE,
+  );
+  
+  $form['create_customer_profiles'] = array(
+    '#title' => t('Create customer profiles for the individual orders'),
+    '#type' => 'checkbox',
   );
 
   $form['submit'] = array(

@@ -6,7 +6,7 @@
  */
 
 /*
- * Implement hook_enable().
+ * Implements hook_enable().
  */
 function commerce_feeds_enable() {
   // Clear the cache to display in Feeds as available plugin.

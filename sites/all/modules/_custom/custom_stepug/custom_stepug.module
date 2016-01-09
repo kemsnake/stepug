@@ -129,7 +129,6 @@ function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'user_login') {
     $form['name']['#size'] = 55;
     $form['pass']['#size'] = 55;
-    dsm($form);
   }
   if ($form_id == 'user_register_form') {
     $form['account']['name']['#size'] = 55;

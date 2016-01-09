@@ -352,8 +352,6 @@ function custom_stepug_entity_view($entity, $type, $view_mode, $langcode) {
     );
   }
 }
-<<<<<<< HEAD
-=======
 
 /**
  * Implements hook_token_info(). This hook will register tow token lname and fname.
@@ -388,4 +386,3 @@ function custom_stepug_tokens($type, $tokens, array $data = array(), array $opti
 
   return $replacements;
 }
->>>>>>> ae4563c6a8c51c9966b97f8f2a10247d288d8eab

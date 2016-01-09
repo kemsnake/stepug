@@ -73,6 +73,30 @@ function custom_stepug_menu_alter(&$items) {
 function custom_stepug_robokassa_success() {
   $build = array();
   if (isset($_POST['InvId']) && isset($_POST['OutSum']) && isset($_POST['SignatureValue'])) {
+    $order = commerce_order_load($_POST['InvId']);
+    $output = views_embed_view('order_for_email', 'block', $order->order_id);
+    $my_module = 'custom_stepug';
+    $from = variable_get('system_mail', 'info@stepug.ru');
+    $message = array(
+      'id' => $my_module,
+      'from' => $from,
+      'to' => 'kemsnake@yandex.ru',
+      'subject' => 'Получена оплата по заказу номер ' . $order->order_id,
+      'body' => $output,
+      'headers' => array(
+        'From' => $from,
+        'Sender' => $from,
+        'Return-Path' => $from,
+      ),
+    );
+
+    $system = drupal_mail_system($my_module, 'order_success_paid');
+    if ($system->mail($message)) {
+      watchdog('mail', 'Successfully sent mail about order %order_id paid to admin', array('%order_id' => $order->order_id));
+    }
+    else {
+      watchdog('mail', 'Failed send mail about order %order_id paid to admin', array('%order_id' => $order->order_id), 'error');
+    }
     $message = t('Thank you, payment successful. Order #@shop_order,<br />', array('@shop_order' => $_POST['InvId']));
     drupal_set_message($message, 'status');
     global $user;

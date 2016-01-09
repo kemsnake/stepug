@@ -378,6 +378,7 @@ function custom_stepug_tokens($type, $tokens, array $data = array(), array $opti
       switch ($name) {
         case 'email-order':
           $output = views_embed_view('order_for_email', 'block', $commerce_order->order_id);
+          watchdog('d1', '<pre>' . var_export($output,true) . '</pre>');
           $replacements[$original] = $output;
           break;
       }

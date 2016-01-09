@@ -253,7 +253,7 @@ function commerce_robokassa_result() {
         $message = array(
           'id' => $my_module,
           'from' => $from,
-          'to' => 'kemsnake@yandex.ru',
+          'to' => 'kemsnake@yandex.ru, dotta@yandex.ru',
           'subject' => 'Получена оплата по заказу номер ' . $order->order_id,
           'body' => $output,
           'headers' => array(

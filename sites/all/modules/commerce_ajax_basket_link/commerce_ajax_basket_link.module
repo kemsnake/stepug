@@ -110,7 +110,7 @@ function commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback($for
   $submit_id = $form['submit']['#id'];
 
   $errors = drupal_get_messages('error');
-  if (count($errors['error']) == 0) {
+  if (!isset($errors['error']) || count($errors['error']) == 0) {
     // Basket items into top nav.
     $output = commerce_ajax_basket_link_static_output();
     $output['#markup'] = '<div class="content clearfix">' . $output['#markup'] . '</div>';

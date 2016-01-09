@@ -113,7 +113,7 @@ function commerce_ajax_basket_link_ajax_cart_form_add_to_cart_ajax_callback($for
   if (!isset($errors['error']) || count($errors['error']) == 0) {
     // Basket items into top nav.
     $output = commerce_ajax_basket_link_static_output();
-    $output['#markup'] = '<div class="content clearfix">' . $output['#markup'] . '</div>';
+    $output['#markup'] = '<div class="block__content content clearfix">' . $output['#markup'] . '</div>';
     $commands[] = ajax_command_replace('#' . $submit_id, '<p>' . l(t('Item added to basket'), 'cart') . '</p>');
     $commands[] = ajax_command_replace('#block-commerce-ajax-basket-link-commerce-ajax-basket-link .block__content', $output['#markup']);
   }

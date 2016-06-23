@@ -1,5 +1,25 @@
 <?php
 
+/**
+ * @file
+ * Contains devel generate information for Commerce Price fields.
+ */
+
+/**
+ * Price value generation for fields.
+ *
+ * @param object $object
+ *   The entity object.
+ * @param array $field
+ *   The field definition.
+ * @param array $instance
+ *   The instance definition.
+ * @param string $bundle
+ *   The entity bundle.
+ *
+ * @return array
+ *   Returns price field array data.
+ */
 function commerce_price_devel_generate($object, $field, $instance, $bundle) {
   if (field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_CUSTOM) {
     return devel_generate_multiple('_commerce_price_devel_generate', $object, $field, $instance, $bundle);
@@ -9,6 +29,21 @@ function commerce_price_devel_generate($object, $field, $instance, $bundle) {
   }
 }
 
+/**
+ * Price value generation.
+ *
+ * @param object $object
+ *   The entity object.
+ * @param array $field
+ *   The field definition.
+ * @param array $instance
+ *   The instance definition.
+ * @param string $bundle
+ *   The entity bundle.
+ *
+ * @return array
+ *   Returns price field array data.
+ */
 function _commerce_price_devel_generate($object, $field, $instance, $bundle) {
   $object_field = array();
   $min = !empty($object->commerce_devel_generate['min_price']) ? $object->commerce_devel_generate['min_price'] : 1;

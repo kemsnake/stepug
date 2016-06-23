@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Devel Generate batch handling functions using the BatchAPI
+ * @file
+ * Devel Generate batch handling functions using the BatchAPI.
  */
 
 /**
@@ -16,7 +17,10 @@ function commerce_devel_generate_batch_products($form_state) {
     $operations[] = array('commerce_devel_generate_batch_products_kill', array($form_state['values']));
   }
   // Setup the batch operation to create the products.
-  $operations[] = array('commerce_devel_generate_batch_products_add_product',array($form_state['values']));
+  $operations[] = array(
+    'commerce_devel_generate_batch_products_add_product',
+    array($form_state['values']),
+  );
   // Setup the batch array with the previously added operations.
   $batch = array(
     'title' => t('Generating Products'),
@@ -29,7 +33,7 @@ function commerce_devel_generate_batch_products($form_state) {
 }
 
 /**
- * Function for trigger batch generation of orders
+ * Function for trigger batch generation of orders.
  *
  * @TODO: Review for improvements and better performance and memory usage.
  */
@@ -42,7 +46,13 @@ function commerce_devel_generate_batch_orders($form_state) {
   );
 
   if ($form_state['values']['kill_orders']) {
-    $batch['operations'][] = array('commerce_devel_generate_batch_orders_kill', array($form_state['values']['kill_transactions'], $form_state['values']['kill_customer_profiles']));
+    $batch['operations'][] = array(
+      'commerce_devel_generate_batch_orders_kill',
+      array(
+        $form_state['values']['kill_transactions'],
+        $form_state['values']['kill_customer_profiles'],
+      ),
+    );
   }
 
   $batch['operations'][] = array('commerce_devel_generate_batch_orders_add', array($form_state['values']));
@@ -138,24 +148,23 @@ function commerce_devel_generate_batch_finished($success, $results, $operations)
   drupal_set_message($message);
 }
 
-/** 
+/**
  * Create Customer Profile.
  */
 function commerce_devel_generate_batch_customer_profile($type, $uid) {
   $profile = commerce_customer_profile_new($type, $uid);
-  
+
   $address_info = array();
   $address_info['name_line'] = ucwords(devel_generate_word(mt_rand(6, 12)));
   $address_info['first_name'] = ucwords(devel_generate_word(mt_rand(6, 12)));
   $address_info['last_name'] = ucwords(devel_generate_word(mt_rand(6, 12)));
-
 
   $address_info['thoroughfare'] = ucwords(devel_generate_word(mt_rand(6, 12)));
   $address_info['locality'] = ucwords(devel_generate_word(mt_rand(6, 12)));
   $address_info['country'] = array_rand(_addressfield_country_options_list());
   $address_info['postal_code'] = rand(00000, 99999);
   $address_info += addressfield_default_values();
-  
+
   $instances = field_info_instances('commerce_customer_profile', $type);
   foreach ($instances as $name => $instance) {
     $info_field = field_info_field($name);
@@ -166,17 +175,21 @@ function commerce_devel_generate_batch_customer_profile($type, $uid) {
     }
   }
   commerce_customer_profile_save($profile);
-  return $profile;  
+  return $profile;
 }
 /**
- * Create Order Batch Functions:
+ * Create Order Batch Functions.
  */
 
 /**
  * Deletes all existing orders.
  *
- * @param $kill_transactions
- *    Boolean indicating that the order's transactions should be removed as well.
+ * @param bool $kill_transactions
+ *   Payment transaction removal bool.
+ * @param bool $kill_customer_profiles
+ *   Customer profile removal pool.
+ * @param array $context
+ *   The batch context.
  */
 function commerce_devel_generate_batch_orders_kill($kill_transactions, $kill_customer_profiles, &$context) {
   if (empty($context['sandbox'])) {
@@ -196,10 +209,10 @@ function commerce_devel_generate_batch_orders_kill($kill_transactions, $kill_cus
 
       commerce_payment_transaction_delete_multiple($transaction_ids);
     }
-    
+
     if ($kill_customer_profiles) {
       $customer_profile_ids = db_query("SELECT commerce_customer_billing_profile_id FROM {field_data_commerce_customer_billing} WHERE entity_type = 'commerce_order' AND entity_id  IN (:ids)", array(':ids' => $order_ids))->fetchCol();
-      
+
       commerce_customer_profile_delete_multiple($customer_profile_ids);
     }
 
@@ -217,12 +230,14 @@ function commerce_devel_generate_batch_orders_kill($kill_transactions, $kill_cus
 /**
  * Generate new orders.
  *
- * $options
- *    Mixed array containing options retrieved through the Form API.
+ * @param array $options
+ *   Mixed array containing options retrieved through the Form API.
+ * @param array $context
+ *   The batch context.
  */
 function commerce_devel_generate_batch_orders_add($options, &$context) {
   module_load_include('inc', 'devel_generate');
-  
+
   if (empty($context['sandbox'])) {
     // Options.
     $context['sandbox']['options'] = $options;
@@ -248,7 +263,7 @@ function commerce_devel_generate_batch_orders_add($options, &$context) {
 
   $batch_size = min(50, $context['sandbox']['max'] - $context['sandbox']['progress']);
 
-  for ($x = 0; $x < $batch_size; $x ++) {
+  for ($x = 0; $x < $batch_size; $x++) {
     $uid = $context['sandbox']['users'][array_rand($context['sandbox']['users'])];
     $date = mt_rand($context['sandbox']['options']['start'], $context['sandbox']['options']['end']);
     $product_count = mt_rand($context['sandbox']['options']['min_products'], $context['sandbox']['options']['max_products']);
@@ -256,7 +271,7 @@ function commerce_devel_generate_batch_orders_add($options, &$context) {
     $order = commerce_cart_order_new($uid);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-    for ($i = 0; $i < $product_count; $i ++) {
+    for ($i = 0; $i < $product_count; $i++) {
       $product_entity = $context['sandbox']['products'][array_rand($context['sandbox']['products'])];
 
       $product = commerce_product_load($product_entity->product_id);
@@ -270,14 +285,14 @@ function commerce_devel_generate_batch_orders_add($options, &$context) {
     }
 
     $order->created = $date;
-    
+
     if ($context['sandbox']['options']['create_customer_profiles']) {
       $billing_profile = commerce_devel_generate_batch_customer_profile('billing', $uid);
       $shipping_profile = commerce_devel_generate_batch_customer_profile('shipping', $uid);
 
       $context['results']['customer_profiles'][] = $billing_profile;
       $context['results']['customer_profiles'][] = $shipping_profile;
-    
+
       $order->commerce_customer_billing[LANGUAGE_NONE][0]['profile_id'] = $billing_profile->profile_id;
       $order->commerce_customer_shipping[LANGUAGE_NONE][0]['profile_id'] = $shipping_profile->profile_id;
 
@@ -307,7 +322,7 @@ function commerce_devel_generate_batch_orders_add($options, &$context) {
       $context['results']['transactions'][] = $transaction;
     }
 
-    $context['sandbox']['progress'] ++;
+    $context['sandbox']['progress']++;
   }
 
   if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
@@ -325,7 +340,7 @@ function commerce_devel_generate_batch_orders_finished($success, $results, $oper
     if (count($results['transactions'])) {
       drupal_set_message(format_plural(count($results['transactions']), 'Created 1 transaction', 'Created @count transactions'));
     }
-    
+
     if (count($results['customer_profiles'])) {
       drupal_set_message(format_plural(count($results['customer_profiles']), 'Created 1 customer profile', 'Created @count customer profiles'));
     }

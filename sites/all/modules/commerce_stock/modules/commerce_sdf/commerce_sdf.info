@@ -3,9 +3,9 @@ description = Provide a Decimal formater for converting stock levels into text m
 package = Commerce (stock)
 dependencies[] = number
 core = 7.x
-; Information added by Drupal.org packaging script on 2015-10-19
-version = "7.x-2.2"
+; Information added by Drupal.org packaging script on 2016-03-29
+version = "7.x-2.3"
 core = "7.x"
 project = "commerce_stock"
-datestamp = "1445253540"
+datestamp = "1459244643"
 

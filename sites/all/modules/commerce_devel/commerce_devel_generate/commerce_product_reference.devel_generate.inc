@@ -1,7 +1,24 @@
 <?php
 
 /**
+ * @file
+ * Contains devel generate information for Commerce Product Reference fields.
+ */
+
+/**
  * Support for processing commerce product reference fields in devel generate.
+ *
+ * @param object $object
+ *   The entity object.
+ * @param array $field
+ *   The field definition.
+ * @param array $instance
+ *   The instance definition.
+ * @param string $bundle
+ *   The entity bundle.
+ *
+ * @return array
+ *   Returns price field array data.
  */
 function commerce_product_reference_devel_generate($object, $field, $instance, $bundle) {
   if (field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_CUSTOM) {
@@ -13,11 +30,26 @@ function commerce_product_reference_devel_generate($object, $field, $instance, $
   }
 }
 
+/**
+ * Product reference value generation for fields.
+ *
+ * @param object $object
+ *   The entity object.
+ * @param array $field
+ *   The field definition.
+ * @param array $instance
+ *   The instance definition.
+ * @param string $bundle
+ *   The entity bundle.
+ *
+ * @return array
+ *   Returns price field array data.
+ */
 function _commerce_product_reference_devel_generate($object, $field, $instance, $bundle) {
   $object_field = array();
   // Get all the referenceable product types.
   $referenceable_types = array_keys($instance['settings']['referenceable_types']);
-  foreach($instance['settings']['referenceable_types'] as $product_type => $value) {
+  foreach ($instance['settings']['referenceable_types'] as $product_type => $value) {
     if ($value) {
       $referenceable_types[] = $product_type;
     }

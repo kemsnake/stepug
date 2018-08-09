@@ -57,7 +57,7 @@ function commerce_shipping_ui_overview($type, $method = NULL) {
       array(
         'data' => $empty_text,
         'colspan' => 2,
-      )
+      ),
     );
   }
 
@@ -67,7 +67,7 @@ function commerce_shipping_ui_overview($type, $method = NULL) {
 /**
  * Builds an overview of a shipping method for display to an administrator.
  *
- * @param $variables
+ * @param array $variables
  *   An array of variables used to generate the display; by default includes the
  *     shipping_method key with a value of the shipping method info array.
  *
@@ -87,7 +87,7 @@ function theme_shipping_method_admin_overview($variables) {
 /**
  * Builds an overview of a shipping service for display to an administrator.
  *
- * @param $variables
+ * @param array $variables
  *   An array of variables used to generate the display; by default includes the
  *     shipping_service key with a value of the shipping service info array.
  *
@@ -112,7 +112,11 @@ function commerce_shipping_ui_rate_calculation_rules() {
 
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled shipping rate calculation rules') . '</h3>';
 
-  $conditions = array('event' => 'commerce_shipping_calculate_rate', 'plugin' => 'reaction rule', 'active' => TRUE);
+  $conditions = array(
+    'event' => 'commerce_shipping_calculate_rate',
+    'plugin' => 'reaction rule',
+    'active' => TRUE,
+  );
   $content['enabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
   $content['enabled']['rules']['#empty'] = t('There are no active shipping rate calculation rules.');
 

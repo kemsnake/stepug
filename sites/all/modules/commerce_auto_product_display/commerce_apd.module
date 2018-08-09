@@ -24,6 +24,28 @@ function commerce_apd_menu() {
 }
 
 /**
+ * Implements hook_entity_update().
+ */
+function commerce_apd_entity_update($entity, $type) {
+  // Check if the updated entity is commerce product.
+  if ($type == "commerce_product") {
+    // Get the product ID.
+    $product_id = $entity->product_id;
+
+    // Get the referencing nodes.
+    $referencing_nodes = _commerce_apd_get_nodes_referencing($product_id);
+
+    // Loop through the nodes
+    foreach ($referencing_nodes as $nid) {
+      // Update node status based on the product status.
+      $node = node_load($nid);
+      $node->status = $entity->status;
+      node_save($node);
+    }
+  }
+}
+
+/**
  * Implements hook_permission().
  * Add permission to configure auto product display.
  */
@@ -40,6 +62,13 @@ function commerce_apd_permission() {
  * Implements hook_form_alter().
  */
 function commerce_apd_form_commerce_product_ui_product_delete_form_alter(&$form, &$form_state, $form_id) {
+  $content_type = _commerce_apd_get_content_type($form_state['product']->type);
+
+  // If we aren't attaching the product to any specific content type, ignore.
+  if ($content_type == "") {
+    return;
+  }
+
   // Add one submit handler to delete product display after product deletion.
   $form['#submit'][] = '_commerce_apd_delete_referencing_node';
   // Reverse the array so the new function will be executed first.
@@ -64,6 +93,16 @@ function _commerce_apd_delete_referencing_node($form, &$form_state) {
  * automatically create product display.
  */
 function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form_state, $form_id) {
+  // Get the default content type for product display.
+  $content_type = _commerce_apd_get_content_type($form_state['commerce_product']->type);
+
+  // If we aren't attaching the product to any specific content type, ignore.
+  if ($content_type == "") {
+    // Notify user that this product has no product display.
+    drupal_set_message(t("This product is not configured to has product display, so it should be added manually when creating product display."));
+    return;
+  }
+
   // Get the referencing node(s).
   $existing_references = array();
   if (isset($form_state['commerce_product']->product_id)) {
@@ -100,9 +139,6 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
         ),
       );
     }
-
-    // Get the default content type for product display.
-    $content_type = _commerce_apd_get_content_type($form_state['commerce_product']->type);
 
     // If there is only one node referencing this product.
     if ($count_existing_references == 1) {
@@ -145,6 +181,31 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
       // Attach the product display form to product creation variable.
       field_attach_form('node', $node, $form['product_display'], $form_state);
 
+      // Check if product display title can be defined manually or just automatically.
+      if (variable_get("commerce_apd_auto_product_display_title", 1) == 0) {
+        // The trick to find the minimum weight from each form components.
+        $min_weight = 0;
+        foreach ($form['product_display'] as $key => $component) {
+          if (substr($key, 0, 1) !== "#" && is_array($component)) {
+            if (isset($component['#weight'])) {
+              if ($component['#weight'] < $min_weight) {
+                $min_weight = $component['#weight'];
+              }
+            }
+          }
+        }
+
+        // Display new field to override product display title.
+        // This field will be displayed first. That's why we need the minimum weight.
+        $form['product_display']['display_title'] = array(
+          '#title' => t('Displayed title'),
+          '#description' => t('The title that will be displayed in front-end. Leave it empty to use the same title as the product.'),
+          '#type' => 'textfield',
+          '#weight' => $min_weight - 1,
+          '#default_value' => isset($node->title) ? $node->title : '',
+        );
+      }
+
       // Don't include the product reference field because it will be filled
       // automatically after form submission.
       unset($form['product_display'][$field_product]);
@@ -173,7 +234,7 @@ function commerce_apd_form_commerce_product_ui_product_form_alter(&$form, &$form
     // Finally, display them in a table.
     $form['referencing_nodes']['table'] = array(
       '#theme' => 'table',
-      '#header' => array('Title', 'Action'),
+      '#header' => array('Title', 'Language', 'Action'),
       '#rows' => $rows,
       '#empty' => t('No content available.'),
     );
@@ -201,7 +262,7 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
     // Get the field name which type is product reference.
     $field_product = _commerce_apd_get_product_field($content_type);
 
-    // TODO: Find a better way to store language for node.
+    // TO DO: Find a better way to store language for node.
     $lang = LANGUAGE_NONE;
 
     // If there is no submitted value storing the referenced node id, create a new node.
@@ -211,7 +272,6 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
       $node->is_new = TRUE;
       $node->type = $content_type;
       $node->uid = $user->uid;
-      $node->title = $form_state['values']['title'];
 
       // Variable for storing temporary attached form.
       $form2 = array();
@@ -237,6 +297,22 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
       // Add other fields (if any) to the node class,
       // so they value can also be saved.
       entity_form_submit_build_entity('node', $node, $node_form, $form_state);
+
+      // Check if product display title can be defined manually or just automatically.
+      $auto_product_display_title = true;
+      if (variable_get("commerce_apd_auto_product_display_title", 1) == 0) {
+        $auto_product_display_title = false;
+      }
+
+      // Check if the product display title will be overriden.
+      // This code must be placed after running entity_form_submit_build_entity above.
+      $display_title = isset($form_state['values']['display_title']) ? $form_state['values']['display_title'] : '';
+      if ($display_title != '' && $auto_product_display_title == false) {
+        $node->title = $form_state['values']['display_title'];
+      }
+      else {
+        $node->title = $form_state['values']['title'];
+      }
 
       // Save the product reference field.
       $node->$field_product = array(
@@ -332,6 +408,22 @@ function commerce_apd_product_form_reference_submit(&$form, &$form_state) {
         // so they value can also be saved.
         entity_form_submit_build_entity('node', $node, $node_form, $form_state);
 
+        // Check if product display title can be defined manually or just automatically.
+        $auto_product_display_title = true;
+        if (variable_get("commerce_apd_auto_product_display_title", 1) == 0) {
+          $auto_product_display_title = false;
+        }
+
+        // Check if the product display title will be overriden.
+        // This code must be placed after running entity_form_submit_build_entity above.
+        $display_title = isset($form_state['values']['display_title']) ? $form_state['values']['display_title'] : '';
+        if ($display_title != '' && $auto_product_display_title == false) {
+          $node->title = $form_state['values']['display_title'];
+        }
+        else {
+          $node->title = $form_state['values']['title'];
+        }
+
         // Set language here.
         $node->language = $lang;
 
@@ -386,17 +478,20 @@ function _commerce_apd_get_nodes_referencing($product_id) {
  */
 function _commerce_apd_get_product_reference_detail($existing_reference, $product_id) {
   if ($existing_reference != '') {
-    $node_obj = db_query('SELECT n.nid, n.title FROM {node} n WHERE nid = :nid', array(':nid' => $existing_reference))->fetchObject();
+    $node_obj = db_query('SELECT n.nid, n.title, n.language FROM {node} n WHERE nid = :nid', array(':nid' => $existing_reference))->fetchObject();
     $node_title = $node_obj->title;
     $node_id = $node_obj->nid;
+    $node_language = $node_obj->language;
   }
   else {
     $node_title = '';
     $node_id = '';
+    $node_language = '';
   }
 
   return array(
     'title' => $node_title,
+    'language' => $node_language,
     'link' => l(t('view'), 'node/' . $node_id) . ' &nbsp;&nbsp;&nbsp; ' . l(t('edit'), 'node/' . $node_id . '/edit', array('query' => array('destination' => 'admin/commerce/products/' . $product_id . '/edit?destination=admin/commerce/products'))),
   );
 }
@@ -431,7 +526,7 @@ function _commerce_apd_get_content_type($product_type) {
     $content_type = $content_type[$product_type];
   }
   else {
-    $content_type = "product_display";
+    $content_type = "";
   }
 
   return $content_type;

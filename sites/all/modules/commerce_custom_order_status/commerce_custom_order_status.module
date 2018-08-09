@@ -1,116 +1,142 @@
 <?php
 
 /**
+ * @file
+ * Allow to create and administer custom statuses for Commerce orders.
+ */
+
+/**
  * Implements hook_menu().
  */
 function commerce_custom_order_status_menu() {
-
 	$items = array();
 
 	$items['admin/commerce/config/order/status/add'] = array(
-    'title' => 'Add Order Status', 
+    'title' => 'Add order status',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_custom_order_status_form'), 
+    'page arguments' => array('commerce_custom_order_status_form'),
     'access arguments' => array('configure order settings'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_ACTION,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
 
-  $items['admin/commerce/config/order/status/%/edit'] = array(
-    'title' => 'Edit Order Status', 
+  $items['admin/commerce/config/order/status/%commerce_order_status/edit'] = array(
+    'title' => 'Edit order status',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_custom_order_status_form', 5), 
+    'page arguments' => array('commerce_custom_order_status_form', 5),
     'access arguments' => array('configure order settings'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
   );
 
-  $items['admin/commerce/config/order/status/%/delete'] = array(
-    'title' => 'Delete Order Status', 
+  $items['admin/commerce/config/order/status/%commerce_order_status/delete'] = array(
+    'title' => 'Delete order status',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_custom_order_status_delete_confirm',5), 
+    'page arguments' => array('commerce_custom_order_status_delete_confirm', 5),
     'access arguments' => array('configure order settings'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
   );
 
   return $items;
-
-} // commerce_custom_order_status_menu
+}
 
 /**
- * Returns order status form.
+ * Implements hook_commerce_order_status_info().
  */
-function commerce_custom_order_status_form($form, &$form_state, $status_name = FALSE) {
+function commerce_custom_order_status_commerce_order_status_info() {
+  $statuses = array();
 
-	$form['name'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Machine name'),
-		'#size' => 60,
-		'#required' => TRUE,
-	);
+  foreach (commerce_custom_order_status_get_statuses() as $name => $status) {
+    $status['custom'] = TRUE;
+    $statuses[$name] = $status;
+  }
+
+  return $statuses;
+}
+
+/**
+ * Form builder; order status form.
+ *
+ * @see commerce_custom_order_status_form_submit()
+ * @ingroup forms
+ */
+function commerce_custom_order_status_form($form, &$form_state, $status = NULL) {
+  $schema = drupal_get_schema('commerce_custom_order_status');
+  $default = array_map(create_function('$field', 'return isset($field["default"]) ? $field["default"] : "";'), $schema['fields']);
+
+  if ($status) {
+    $default = $status + $default;
+  }
 
   $form['title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Display name'),
-    '#size' => 60,
+    '#title' => t('Title'),
+    '#default_value' => $default['title'],
+    '#maxlength' => 255,
     '#required' => TRUE,
   );
 
-  $states = commerce_order_states();
+  $form['name'] = array(
+		'#type' => 'machine_name',
+    '#title' => t('Name'),
+    '#default_value' => $default['name'],
+    '#machine_name' => array(
+      'exists' => 'commerce_custom_order_status_name_exists',
+      'source' => array('title'),
+    ),
+    '#maxlength' => 255,
+		'#required' => TRUE,
+    // A status name should not be changed, since it may be referenced in
+    // an existing order.
+    // @todo To achieve such process, we should update all the existing orders
+    // that use the otl status name by the new value. Such task may be done if
+    // a feature request is posted on D.org, otherwise it is a time wasting.
+    '#disabled' => !empty($default['name']),
+	);
+
   $state_options = array();
 
-  foreach ($states as $state) {
+  foreach (commerce_order_states() as $state) {
     $state_options[$state['name']] = $state['title'];
-  } // foreach
+  }
 
   $form['state'] = array(
     '#type' => 'select',
-    '#title' => t('Display name'),
+    '#title' => t('Order state'),
+    '#default_value' => $default['state'],
     '#options' => $state_options,
+    '#description' => t('Specify the order state this status is related.'),
     '#required' => TRUE,
   );
 
   $form['cart'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Cart'),
-    '#decription' => t('Orders with this status should be considered a cart'),
+    '#title' => t('Apply to an order that is in the shopping cart'),
+    '#default_value' => $default['cart'],
+    '#description' => t('If checked, orders with this status should be considered as shopping cart orders'),
   );
 
   $form['weight'] = array(
     '#type' => 'textfield',
     '#title' => t('Weight'),
+    '#default_value' => $default['weight'],
     '#size' => 6,
-    '#default_value' => 0,
-    '#required' => TRUE,
   );
 
   $form['status'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enabled'),
+    '#default_value' => $default['status'],
   );
 
-  if ($status_name) {
+  $form['actions'] = array('#type' => 'actions');
 
-    $status = commerce_order_status_load($status_name);
-    $form['name']['#default_value'] = $status['name'];
-    $form['title']['#default_value'] = $status['title'];
-    $form['state']['#default_value'] = $status['state'];
-    $form['cart']['#default_value'] = ($status['cart']) ? 1 : 0;
-    $form['weight']['#default_value'] = $status['weight'];
-    $form['status']['#default_value'] = ($status['status']) ? 1 : 0;
-
-    $form['old_name'] = array(
-      '#type' => 'value',
-      '#value' => $status['name'],
-    );
-
-  } // if
-
-  $form['submit'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
 
-  if ($status_name) {
-    $form['delete'] = array(
+  if ($status) {
+    $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
       '#submit' => array('commerce_custom_order_status_delete_submit'),
@@ -119,180 +145,149 @@ function commerce_custom_order_status_form($form, &$form_state, $status_name = F
 
 	return $form;
 
-} // commerce_custom_order_status_form
+}
 
 /**
- * Handles form submission.
+ * Check if a given machine name exists.
+ */
+function commerce_custom_order_status_name_exists($name) {
+  return db_query_range('SELECT 1 FROM {commerce_custom_order_status} WHERE name = :name', 0, 1, array(':name' => $name))->fetchField();
+}
+
+/**
+ * Form submission handler; create or update an order status.
+ *
+ * @see commerce_custom_order_status_form()
  */
 function commerce_custom_order_status_form_submit($form, &$form_state) {
+  $pks = array();
 
-  $values = $form_state['values'];
+  if (!empty($form_state['build_info']['args'][0])) {
+    $pks[] = 'name';
+  }
 
-  $fields = array(
-    'name' => $values['name'],
-    'title' => $values['title'],
-    'state' => $values['state'],
-    'cart' => $values['cart'],
-    'weight' => $values['weight'],
-    'status' => $values['status'],
-  );
-
-  if (isset($values['old_name'])) {
-
-    db_update('commerce_custom_order_status')
-      ->fields($fields)
-      ->condition('name', $values['old_name'])
-      ->execute();
-
-  } // if
-  else {
-
-    db_insert('commerce_custom_order_status')
-      ->fields($fields)
-      ->execute();
-
-  } // else
-
-  drupal_set_message(t('Order status saved.'));
-  drupal_goto('admin/commerce/config/order');
-
-} // commerce_custom_order_status_form_submit
+  drupal_write_record('commerce_custom_order_status', $form_state['values'], $pks);
+  drupal_set_message(t('The order status %name has been saved.', array('%name' => $form_state['values']['title'])));
+  $form_state['redirect'] = 'admin/commerce/config/order';
+}
 
 /**
- * Implements hook_commerce_order_status_info().
+ * Get all existing statuses from database.
  */
-function commerce_custom_order_status_commerce_order_status_info() {
-
-  $query = db_select('commerce_custom_order_status', 's');
-  $results = $query->fields('s')->execute();
-
-  $statuses = array();
-
-  foreach ($results as $result) {
-    $statuses[$result->name] = array(
-      'name' => $result->name,
-      'title' => $result->title,
-      'state' => $result->state,
-      'cart' => ($result->cart == 1),
-      'weight' => $result->weight,
-      'status' => ($result->status == 1),
-    );
-  } // foreach
-
-  return $statuses;
-
-} // commerce_custom_order_status_order_status_info
+function commerce_custom_order_status_get_statuses() {
+  return db_select('commerce_custom_order_status')->fields('commerce_custom_order_status')->execute()->fetchAllAssoc('name', PDO::FETCH_ASSOC);
+}
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_ID_alter().
  */
-function commerce_custom_order_status_form_alter(&$form, &$form_state, $form_id) {
+function commerce_custom_order_status_form_commerce_order_settings_form_alter(&$form, &$form_state) {
+  $rows = array();
+  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_custom_order_status') . '/commerce_custom_order_status.css';
 
-  if ($form_id == 'commerce_order_settings_form') {
-
-    $custom_statuses = array();
-
-    $query = db_select('commerce_custom_order_status', 's');
-    $results = $query->fields('s', array('name'))->execute();
-
-    foreach ($results as $result) {
-      $custom_statuses[$result->name] = TRUE;
-    } // foreach
-
-    $states = commerce_order_states();
-    $rows = array();
-
-    foreach ($states as $state) {
-
-      $statuses = commerce_order_statuses(array('state' => $state['name']));
+  foreach (commerce_order_states() as $state) {
+    if ($statuses = commerce_order_statuses(array('state' => $state['name']))) {
+      $rows[] = array(
+        array(
+          'colspan' => 4,
+          'class' => array('state-title'),
+          'data' => check_plain($state['title']),
+        ),
+      );
 
       foreach ($statuses as $status) {
+        $row = $links = array();
 
-        $action = '';
+        if (!empty($status['custom'])) {
+          $links[] = l(t('edit'), 'admin/commerce/config/order/status/' . $status['name'] . '/edit');
+          $links[] = l(t('delete'), 'admin/commerce/config/order/status/' . $status['name'] . '/delete');
 
-        if (isset($custom_statuses[$status['name']])) {
-          $action = '<ul><li>' . l('Edit', 'admin/commerce/config/order/status/' . $status['name'] . '/edit') . '</li><li>';
-          $action .= l('Delete', 'admin/commerce/config/order/status/' . $status['name'] . '/delete') . '</li></ul>';
-        } // if
+          if (module_exists('i18n_commerce_custom_order_status')) {
+            $links[] = l(t('translate'), 'admin/commerce/config/order/status/' . $status['name'] . '/translate');
+          }
+        }
+
+        $row[] = check_plain($status['title']);
+        $row[] = $status['cart'] ? t('Yes') : t('No');
+        $enabled = $status['status'] ? t('Yes') : t('No');
+
+        if ($links) {
+          $row[] = $enabled;
+          $row[] = theme('item_list', array('items' => $links));
+        }
+        else {
+          $row[] = array('colspan' => 2, 'data' => $enabled);
+        }
 
         $rows[] = array(
-          $state['title'],
-          $status['title'],
-          $action
+          'class' => array($status['status'] ? 'status-enabled' : 'status-disabled'),
+          'data' => $row,
         );
-
-      } // foreach
-
-    } // foreach
+      }
+    }
+  }
 
     $form['states'] = array(
       '#theme' => 'table',
-      '#prefix' => '<h4>' . t('Order statuses') . '</h4><ul class="action-links"><li>' . l('Add status', 'admin/commerce/config/order/status/add') . '</li></ul>',
-      '#header' => array(t('State'), t('Status'), t('Action')), 
-      '#rows' => $rows
+    '#attributes' => array('id' => 'commerce-custom-order-status-table'),
+    '#prefix' => '<h4>' . t('Order statuses') . '</h4>',
+    '#header' => array(t('Status'), t('Shopping cart order'), t('Enabled'), t('Action')),
+    '#rows' => $rows,
+    '#weight' => -10,
     );
-
-    $form['actions']['#weight'] = 999;
-
-  } // if
-
-} // commerce_custom_order_status_form_alter
+}
 
 /**
  * Handles form submission if 'Delete' was selected in edit form.
  * Used node_form_delete_submit in node.pages.inc for reference
  */
 function commerce_custom_order_status_delete_submit($form, &$form_state) {
-  
   $destination = array();
-  
+
   if (isset($_GET['destination'])) {
     $destination = drupal_get_destination();
     unset($_GET['destination']);
-  } // if
+  }
 
-  $status_name = $form_state['values']['name'];
-  $form_state['redirect'] = array('admin/commerce/config/order/status/' . $status_name . '/delete', array('query' => $destination));
-
-} // commerce_custom_order_status_delete_submit
+  $form_state['redirect'] = array(
+    'admin/commerce/config/order/status/' . $form_state['build_info']['args'][0]['name'] . '/delete',
+    array('query' => $destination),
+  );
+}
 
 /**
- * Confirms deletion.
+ * Confirm form for deletion.
  */
-function commerce_custom_order_status_delete_confirm($form, &$form_state, $status_name = FALSE) {
+function commerce_custom_order_status_delete_confirm($form, &$form_state, $status) {
+  $form['name'] = array('#type' => 'value', '#value' => $status['name']);
+  $form['title'] = array('#type' => 'value', '#value' => $status['title']);
 
   // Check to see if the status is being used for any orders
-  $query = db_select('commerce_order', 'co');
-  $query
-    ->fields('co', array('order_id', 'status'))
-    ->condition('co.status', $status_name)
-    ->orderBy('co.order_id', 'DESC');
+  $query = db_select('commerce_order')
+    ->fields('commerce_order', array('order_id', 'status'))
+    ->condition('status', $status['name'])
+    ->orderBy('order_id', 'DESC');
 
-  $num_rows = $query->countQuery()->execute()->fetchField();
+  if ($num_rows = $query->countQuery()->execute()->fetchField()) {
+    drupal_set_message(format_plural(
+      $num_rows,
+      'This status is currently being used by @count order. Choose a new status for this order.',
+      'This status is currently being used by @count orders. Choose a new status for those orders.'
+    ), 'warning');
 
-  if ($num_rows != 0) {
+    $options = array();
 
-    $statuses = commerce_order_statuses();
-    $status_options = array();
-
-    if($num_rows == 1) {
-      drupal_set_message(t('This status is currently being used 1 order. Choose a new status for the order.'), 'warning');
-    } // if
-    else {
-	   drupal_set_message(t('This status is currently being used by %num_rows orders. Choose a new status for the orders.', array('%num_rows' => $num_rows)), 'warning');
-    } // else
-
-    foreach ($statuses as $status) {
-      // Make sure the status they are deleting isn't a choice
-  	  if($status['name'] != $status_name) {
-        $status_options[$status['name']] = $status['title'];
-      } // if
-    } // foreach
+    foreach (commerce_order_statuses() as $order_status) {
+      // Ensure the status being deleted isn't an option.
+  	  if ($order_status['name'] != $status['name']) {
+        $options[$order_status['name']] = $order_status['title'];
+      }
+    }
 
   	$form['new_status'] = array(
       '#type' => 'select',
       '#title' => t('Order Status'),
-      '#options' => $status_options,
+      '#options' => $options,
       '#required' => TRUE,
     );
 
@@ -303,70 +298,53 @@ function commerce_custom_order_status_delete_confirm($form, &$form_state, $statu
       '#rows' => 5,
       '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
     );
-
-  } // if
-
-  $form['order_status_name'] = array(
-    '#type' => 'value',
-    '#value' => $status_name,
-  );
+  }
 
   return confirm_form($form,
-    t('Are you sure you want to delete this order status?'),
+    t('Are you sure you want to delete the order status %title?', array('%title' => $status['title'])),
     'admin/commerce/config/order',
     t('This action cannot be undone.'),
     t('Delete'),
     t('Cancel')
   );
-
-} // commerce_custom_order_status_delete_confirm
+}
 
 /**
- * Deletes the order status.
+ * Form submission handler; Deletes the order status.
+ *
+ * @see commerce_custom_order_status_delete_confirm()
  */
 function commerce_custom_order_status_delete_confirm_submit($form, &$form_state) {
-  
-  $form_values = $form_state['values'];
-  $sname = $form_values['order_status_name'];
+  $values = $form_state['values'];
 
-  if ($form_values['new_status']) {
-
+  if (!empty($values['new_status'])) {
     // Get order_ids
-    $query = db_select('commerce_order', 'co');
-    $query
-      ->fields('co', array('order_id'))
-      ->condition('co.status', $sname)
-      ->orderBy('co.order_id', 'DESC');
-    $result = $query->execute()->fetchCol(0);
+    $records = db_select('commerce_order')
+      ->fields('commerce_order', array('order_id'))
+      ->condition('status', $values['name'])
+      ->orderBy('order_id', 'DESC')
+      ->execute()
+      ->fetchCol(0);
 
-    foreach ($result as $record) {
+    // Update the status for each order.
+    foreach ($records as $order_id) {
+    	$order = commerce_order_load($order_id);
+      commerce_order_status_update($order, $values['new_status'], FALSE, TRUE, $values['status_message']);
+    }
 
-    	// Update the status for each order
-  	  $order = commerce_order_load($record);
-      commerce_order_status_update($order, $form_values['new_status'], FALSE, TRUE, $form_values['status_message']);
-      drupal_set_message(t('Order number %record has had its status changed to %new_status.', array('%record' => $record, '%new_status' => $form_values['new_status'])),'status');
+    if ($records) {
+      $new_status = commerce_order_statuses(array('name' => $values['new_status']));
 
-    } // foreach
+      drupal_set_message(format_plural(
+        count($records),
+        'Order which ID is @ids has had its status changed to %name.',
+        'The status %name was applied to the orders whith IDs: @ids.',
+        array('@ids' => implode(', ', $records), '%name' => $new_status[$values['new_status']]['title'])
+      ));
+    }
+  }
 
-  } // if
-	
-  if ($form_state['values']['confirm']) {
-
-    $status_name = $form_state['values']['order_status_name'];
-    $status_delete = db_delete('commerce_custom_order_status')
-      ->condition('name', $status_name)
-      ->execute();
-
-    drupal_set_message(t('The order status \'%status\' has been deleted.', array('%status' => $status_name)),'status');
-  
-  } // if
-  else {
-
-    // Let user know if it failed, not sure if this is needed
-    drupal_set_message(t('An error occurd when trying to delete status, please try again'), 'error');
-
-  } // else
-
-  drupal_goto("admin/commerce/config/order");
-
-} // commerce_custom_order_status_delete_confirm_submit
+  db_delete('commerce_custom_order_status')->condition('name', $values['name'])->execute();
+  drupal_set_message(t('The order status %status has been deleted.', array('%status' => $values['title'])));
+  $form_state['redirect'] = 'admin/commerce/config/order';
+}

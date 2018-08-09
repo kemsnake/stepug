@@ -5,6 +5,7 @@
  * Rules integration for shipping.
  *
  * @addtogroup rules
+ *
  * @{
  */
 
@@ -27,7 +28,8 @@ function commerce_shipping_rules_event_info() {
     'access callback' => 'commerce_order_rules_access',
   );
 
-  // Include the Line Item module's Rules integration to reuse its access callback.
+  // Include the Line Item module's Rules integration to reuse
+  // its access callback.
   module_load_include('inc', 'commerce_line_item', 'commerce_line_item.rules');
 
   $events['commerce_shipping_calculate_rate'] = array(
@@ -88,9 +90,9 @@ function commerce_shipping_service_rules_options_list() {
 /**
  * Checks an order for the existence of a shipping line item.
  *
- * @param $order
+ * @param object $order
  *   The order to check for a shipping line item.
- * @param $service
+ * @param string $service
  *   The machine-name of a particular shipping service to search for; if '-any-'
  *   the condition returns TRUE for any found shipping line item.
  */
@@ -203,7 +205,6 @@ function commerce_shipping_rate_apply($order, $service_name = NULL) {
     }
     $service_name = key($order->shipping_rates);
   }
-
 
   // Delete any existing shipping line items from the order.
   commerce_shipping_delete_shipping_line_items($order, TRUE);

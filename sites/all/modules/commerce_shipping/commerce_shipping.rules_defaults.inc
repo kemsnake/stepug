@@ -5,17 +5,16 @@
  * Default rules configurations for Shipping.
  */
 
-
 /**
  * Implements hook_default_rules_configuration().
  */
 function commerce_shipping_default_rules_configuration() {
   $rules = array();
 
-  // When an order's status is updating to "Shopping cart" from any other status,
-  // its shipping line items will be deleted. This captures any cart contents
-  // change via Add to Cart forms / the Shopping cart Views form. It also happens
-  // when the customer cancels out of the checkout form.
+  // When an order's status is updating to "Shopping cart" from any other
+  // status, its shipping line items will be deleted. This captures any
+  // cart contents change via Add to Cart forms / the Shopping cart Views form.
+  // It also happens when the customer cancels out of the checkout form.
   $rule = rules_reaction_rule();
 
   $rule->label = t('Delete shipping line items on shopping cart updates');
@@ -73,9 +72,9 @@ function commerce_shipping_default_rules_configuration() {
     $rule
       ->event('commerce_shipping_collect_rates')
       ->action('commerce_shipping_method_collect_rates', array(
-          'shipping_method_name' => $name,
-          'commerce_order:select' => 'commerce-order',
-        ));
+        'shipping_method_name' => $name,
+        'commerce_order:select' => 'commerce-order',
+      ));
 
     $rules['commerce_shipping_method_' . $name] = $rule;
   }

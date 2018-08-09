@@ -10,9 +10,9 @@ core = 7.x
 
 files[] = includes/views/handlers/commerce_shipping_handler_relationship_shipping_line_item_representative.inc
 
-; Information added by Drupal.org packaging script on 2015-04-08
-version = "7.x-2.2"
+; Information added by Drupal.org packaging script on 2017-11-28
+version = "7.x-2.3"
 core = "7.x"
 project = "commerce_shipping"
-datestamp = "1428479882"
+datestamp = "1511853188"
 

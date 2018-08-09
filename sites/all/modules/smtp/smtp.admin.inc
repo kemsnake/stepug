@@ -3,39 +3,17 @@
 /**
  * @file
  * Administrative page code for the smtp module.
- *
  */
-
 
 /**
  * Administrative settings.
- *
- * @return
- *   An array containing form items to place on the module settings page.
  */
 function smtp_admin_settings() {
-  // Override the smtp_library variable.
-  if (module_exists('mimemail') &&
-      strpos(variable_get('smtp_library', ''), 'mimemail')) {
-    // don't touch smtp_library
+  if (variable_get('smtp_on', 0)) {
+    drupal_set_message(t('SMTP.module is active.'));
   }
   else {
-    if (variable_get('smtp_on', 0)) {
-      $smtp_path = drupal_get_filename('module', 'smtp');
-      if ($smtp_path) {
-        variable_set('smtp_library', $smtp_path);
-        drupal_set_message(t('SMTP.module is active.'));
-      }
-      // If drupal can't find the path to the module, display an error.
-      else {
-        drupal_set_message(t("SMTP.module error: Can't find file."), 'error');
-      }
-    }
-    // If this module is turned off, delete the variable.
-    else {
-      variable_del('smtp_library');
-      drupal_set_message(t('SMTP.module is INACTIVE.'));
-    }
+    drupal_set_message(t('SMTP.module is INACTIVE.'));
   }
 
   $logging = variable_get('smtp_debugging', SMTP_LOGGING_ERRORS);
@@ -47,9 +25,16 @@ function smtp_admin_settings() {
   $form['onoff']['smtp_on'] = array(
     '#type'          => 'radios',
     '#title'         => t('Turn this module on or off'),
-    '#default_value' => variable_get('smtp_on', 0),
+    '#default_value' => variable_get('smtp_on', FALSE),
     '#options'       => array(1 => t('On'), 0 => t('Off')),
     '#description'   => t('To uninstall this module you must turn it off here first.'),
+  );
+  $form['onoff']['smtp_deliver'] = array(
+    '#type'          => 'radios',
+    '#title'         => t('Turn on delivery of emails'),
+    '#default_value' => variable_get('smtp_deliver', TRUE),
+    '#options'       => array(1 => t('On'), 0 => t('Off')),
+    '#description'   => t('With this option turned off, email messages will be queued up and processed as normal, but not actually delivered. This option should only be used for testing purposes.'),
   );
   $form['onoff']['smtp_queue'] = array(
     '#type'  => 'checkbox',
@@ -96,7 +81,7 @@ function smtp_admin_settings() {
       'ssl'      => t('Use SSL'),
       'tls'      => t('Use TLS'),
     );
-    $encryption_description = t('This allows connection to an SMTP server that requires SSL encryption such as Gmail.');
+    $encryption_description = t('This allows connection to a SMTP server that requires SSL encryption such as Gmail.');
   }
   // If openssl is not installed, use normal protocol.
   else {
@@ -128,6 +113,9 @@ function smtp_admin_settings() {
     '#title'         => t('Password'),
     '#default_value' => variable_get('smtp_password', ''),
     '#description'   => t('SMTP password. If you have already entered your password before, you should leave this field blank, unless you want to change the stored password.'),
+    '#attributes'    => array(
+      'autocomplete' => 'off',
+    ),
   );
 
   $form['email_options'] = array(
@@ -153,23 +141,22 @@ function smtp_admin_settings() {
     '#description'   => t('Checking this box will allow Html formatted e-mails to be sent with the SMTP protocol.'),
   );
 
-  // If an address was given, send a test e-mail message.
-  $test_address = variable_get('smtp_test_address', '');
-  if ($test_address != '') {
-    // Clear the variable so only one message is sent.
-    variable_del('smtp_test_address');
-    global $language;
-    $params['subject'] = t('Drupal SMTP test e-mail');
-    $params['body']    = array(t('If you receive this message it means your site is capable of using SMTP to send e-mail.'));
-    drupal_mail('smtp', 'smtp-test', $test_address, $language, $params);
-
-    if ($logging === SMTP_LOGGING_NONE) {
-      drupal_set_message(t('A test e-mail has been sent to @email.', array('@email' => $test_address)));
-    }
-    else {
-      drupal_set_message(t('A test e-mail has been sent to @email. You may want to !check for any error messages.', array('@email' => $test_address, '!check' => l(t('check the logs'), 'admin/reports/dblog'))));
-    }
-  }
+  $form['client'] = array(
+    '#type'  => 'fieldset',
+    '#title' => t('SMTP client settings'),
+  );
+  $form['client']['smtp_client_hostname'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Hostname'),
+    '#default_value' => variable_get('smtp_client_hostname', ''),
+    '#description' => t('The hostname to use in the Message-Id and Received headers, and as the default HELO string. Leave blank for using %server_name.', array('%server_name' => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost.localdomain')),
+  );
+  $form['client']['smtp_client_helo'] = array(
+    '#type' => 'textfield',
+    '#title' => t('HELO'),
+    '#default_value' => variable_get('smtp_client_helo', ''),
+    '#description' => t('The SMTP HELO/EHLO of the message. Defaults to hostname (see above).'),
+  );
 
   $form['email_test'] = array(
     '#type'  => 'fieldset',
@@ -199,44 +186,58 @@ function smtp_admin_settings() {
     '#default_value' => $logging,
     '#description'   => t('Choose the appropriate log level. "Log everything" will log errors and informational messages when an email is sent. "Errors only" will only create a log entry when sending failed. "No logging" will disable all logging for this module.'),
   );
+  $form['email_test']['smtp_reroute_address'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('E-mail address to reroute all emails to'),
+    '#default_value' => variable_get('smtp_reroute_address', ''),
+    '#description'   => t('All emails sent by the site will be rerouted to this email address; use with caution.'),
+  );
+
+  $form['debugging']['maillog'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Maillog integration'),
+  );
+
+  if (!module_exists('maillog')) {
+    $form['debugging']['maillog']['#description'] = t('Installing the <a href="@url">Maillog module</a> also allows keeping copies of all emails sent through the site.', array('@url' => 'https://www.drupal.org/project/maillog'));
+  }
+  else {
+    $form['debugging']['maillog']['#description'] = t('The <a href="@url">Maillog module</a> is installed, it can also be used to keep copies of all emails sent through the site.', array('@url' => url('admin/config/development/maillog')));
+
+    $form['debugging']['maillog']['maillog_log'] = array(
+      '#type' => 'checkbox',
+      '#title' => t("Create table entries in maillog table for each e-mail."),
+      '#default_value' => variable_get('maillog_log', TRUE),
+    );
+
+    $form['debugging']['maillog']['maillog_devel'] = array(
+      '#type' => 'checkbox',
+      '#title' => t("Display the e-mails on page using devel module (if enabled)."),
+      '#default_value' => variable_get('maillog_devel', TRUE),
+      '#disabled' => !module_exists('devel'),
+    );
+  }
 
   $form['#submit'][] = 'smtp_admin_settings_form_submit';
-
-  return system_settings_form($form);
-}  //  End of smtp_admin_settings().
-
-
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'smtp_admin_settings_submit_post_system_settings';
+  return $form;
+}
 
 /**
  * Validation for the administrative settings form.
- *
- * @param form
- *   An associative array containing the structure of the form.
- * @param form_state
- *   A keyed array containing the current state of the form.
  */
 function smtp_admin_settings_validate($form, &$form_state) {
   if ($form_state['values']['smtp_on'] == 1 && $form_state['values']['smtp_host'] == '') {
-    form_set_error('smtp_host', t('You must enter an SMTP server address.'));
+    form_set_error('smtp_host', t('You must enter a SMTP server address.'));
   }
 
   if ($form_state['values']['smtp_on'] == 1 && $form_state['values']['smtp_port'] == '') {
-    form_set_error('smtp_port', t('You must enter an SMTP port number.'));
+    form_set_error('smtp_port', t('You must enter a SMTP port number.'));
   }
 
   if ($form_state['values']['smtp_from'] && !valid_email_address($form_state['values']['smtp_from'])) {
     form_set_error('smtp_from', t('The provided from e-mail address is not valid.'));
-  }
-
-  // If username is set empty, we must set both username/password empty as well.
-  if (empty($form_state['values']['smtp_username'])) {
-    $form_state['values']['smtp_password'] = '';
-  }
-
-  // A little hack. When form is presentend, the password is not shown (Drupal way of doing).
-  // So, if user submits the form without changing the password, we must prevent it from being reset.
-  elseif (empty($form_state['values']['smtp_password'])) {
-    unset($form_state['values']['smtp_password']);
   }
 }  //  End of smtp_admin_settings_validate().
 
@@ -262,5 +263,38 @@ function smtp_admin_settings_form_submit($form, &$form_state) {
     }
 
     variable_set('mail_system', $mail_modes);
+  }
+
+  // If username is set empty, we must set both username/password empty as well.
+  if (empty($form_state['values']['smtp_username'])) {
+    $form_state['values']['smtp_password'] = '';
+  }
+
+  // A little hack. When form is presentend, the password is not shown (Drupal
+  // way of doing). So, if user submits the form without changing the password,
+  // we must prevent it from being reset.
+  elseif (empty($form_state['values']['smtp_password'])) {
+    unset($form_state['values']['smtp_password']);
+  }
+
+  // Save the test address to send an email after all the settings have been
+  // updated.
+  $form_state['storage']['smtp']['smtp_test_address'] = $form_state['values']['smtp_test_address'];
+  unset($form_state['values']['smtp_test_address']);
+}
+
+/**
+ * Submit handler for the administrative settings form containing all
+ * functionality to be run after system_settings_form_submit.
+ */
+function smtp_admin_settings_submit_post_system_settings($form, &$form_state) {
+  // If an address was given, send a test e-mail message.
+  $test_address = $form_state['storage']['smtp']['smtp_test_address'];
+  if ($test_address != '') {
+    $language = language_default();
+    $params['subject'] = t('Drupal SMTP test e-mail');
+    $params['body'] = array(t('If you receive this message it means your site is capable of using SMTP to send e-mail.'));
+    drupal_mail('smtp', 'smtp-test', $test_address, $language, $params);
+    drupal_set_message(t('A test e-mail has been sent to @email. You may want to !check for any error messages.', array('@email' => $test_address, '!check' => l(t('check the logs'), 'admin/reports/dblog'))));
   }
 }

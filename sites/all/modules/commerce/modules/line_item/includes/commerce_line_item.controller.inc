@@ -124,8 +124,12 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
    * @param $transaction
    *   An optional transaction object to pass thru. If passed the caller is
    *   responsible for rolling back the transaction if something goes wrong.
+   * @param boolean $skip_order_save
+   *   TRUE to skip saving the order after deleting the line item. If saving the
+   *   order is skipped, the caller is responsible for saving the order to
+   *   ensure changes to its line item reference field value are saved.
    */
-  public function delete($line_item_ids, DatabaseTransaction $transaction = NULL) {
+  public function delete($line_item_ids, DatabaseTransaction $transaction = NULL, $skip_order_save = FALSE) {
     $line_items = $line_item_ids ? $this->load($line_item_ids) : FALSE;
 
     if (!$line_items) {
@@ -139,9 +143,53 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
     }
 
     try {
-      // First attempt to delete references for the given line items.
+      // First attempt to delete references to each line item, building a list
+      // of modified entities to be saved once each after references to all line
+      // items have been deleted.
+      $reference_fields = commerce_info_fields('commerce_line_item_reference');
+      $modified_entities = array();
+
       foreach ($line_items as $line_item_id => $line_item) {
-        commerce_line_item_delete_references($line_item);
+        // Check the data in every line item reference field.
+        foreach ($reference_fields as $field_name => $field) {
+          // Query for any entity referencing the deleted line item in this field.
+          $query = new EntityFieldQuery();
+          $query->fieldCondition($field_name, 'line_item_id', $line_item->line_item_id, '=');
+          $result = $query->execute();
+
+          // If no results were returned, continue to next field.
+          if (empty($result)) {
+            continue;
+          }
+
+          // Loop over results for each type of entity returned.
+          foreach ($result as $entity_type => $data) {
+            // Load the entities of the current type.
+            $entities = entity_load($entity_type, array_keys($data));
+
+            // Loop over each entity and remove the reference to the deleted line item.
+            foreach ($entities as $entity_id => $entity) {
+              // If we have this entity already, get the reference, otherwise
+              // store the new entity to save changes later.
+              if (!isset($modified_entities[$entity_type . ':' . $entity_id])) {
+                $modified_entities[$entity_type . ':' . $entity_id] = array(
+                  'entity_type' => $entity_type,
+                  'entity' => $entity,
+                );
+              }
+
+              commerce_entity_reference_delete($entity, $field_name, 'line_item_id', $line_item->line_item_id);
+            }
+          }
+        }
+      }
+
+      // Save the entities that were modified through deleted references.
+      foreach ($modified_entities as $entity_data) {
+        if ($skip_order_save && $entity_data['entity_type'] == 'commerce_order') {
+          continue;
+        }
+        entity_save($entity_data['entity_type'], $entity_data['entity']);
       }
 
       return parent::delete($line_item_ids, $transaction);

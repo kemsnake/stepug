@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @file Contains updade hooks for the commerce_shipping module.
+ * @file
+ * Contains update hooks for the commerce_shipping module.
  */
-
 
 /**
  * Implements hook_schema().
@@ -41,7 +41,7 @@ function commerce_shipping_update_7000(&$sandbox) {
 }
 
 /**
- * Add default profile reference field on order if needed
+ * Add default profile reference field on order if needed.
  */
 function commerce_shipping_update_7001(&$sandbox) {
   $profile_types = commerce_shipping_commerce_customer_profile_type_info();
@@ -51,8 +51,7 @@ function commerce_shipping_update_7001(&$sandbox) {
 }
 
 /**
- * Remove all old shipping rules and convert plugin type shipping rules to use
- * the new naming convention.
+ * Tweak shipping rules to use the new naming convention.
  */
 function commerce_shipping_update_7002(&$sandbox) {
   $rules = rules_config_load_multiple(FALSE);
@@ -86,7 +85,8 @@ function commerce_shipping_update_7002(&$sandbox) {
     }
   }
 
-  // Rules doesn't provide any APIs to change the elementName of rule actions, so we modify them directly in the database.
+  // Rules doesn't provide any APIs to change the elementName of rule actions,
+  // so we modify them directly in the database.
   $result = db_select('rules_config', 'r')
     ->fields('r', array('data', 'id'))
     ->condition('r.name', $rules_actions_to_rename, 'IN')
@@ -96,7 +96,7 @@ function commerce_shipping_update_7002(&$sandbox) {
     preg_match('/(\d+):"commerce_shipping_enable_plugin-/', $row->data, $matches);
     if (!empty($matches[1])) {
       $replace = $matches[1] - 7;
-      $data = preg_replace('/\d+(:"commerce_shipping_enable_)plugin-/', $replace . '$1' , $row->data);
+      $data = preg_replace('/\d+(:"commerce_shipping_enable_)plugin-/', $replace . '$1', $row->data);
       db_update('rules_config')
         ->fields(array('data' => $row->data))
         ->condition('id', $row->id)
@@ -108,39 +108,41 @@ function commerce_shipping_update_7002(&$sandbox) {
 }
 
 /**
- * Rename the shipping_method field on the shipping line item to commerce_shipping_method.
- * This should actually never be run on 2.x but is here for reference.
+ * Rename the shipping_method field on the shipping line item.
  */
 function commerce_shipping_update_7003(&$sandbox) {
+  // This should actually never be run on 2.x but is here for reference.
   /*
-  commerce_shipping_line_item_configuration(array('type' => 'shipping'));
-  foreach (commerce_line_item_load_multiple(FALSE, array('type' => 'shipping')) as $line_item) {
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $line_item_wrapper->commerce_shipping_method = $line_item_wrapper->shipping_method->value();
-    $line_item_wrapper->save();
-  }
-  field_delete_field('shipping_method');
+    commerce_shipping_line_item_configuration(array('type' => 'shipping'));
+    foreach (commerce_line_item_load_multiple(FALSE, array('type' => 'shipping')) as $line_item) {
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+      $line_item_wrapper->commerce_shipping_method = $line_item_wrapper->shipping_method->value();
+      $line_item_wrapper->save();
+    }
+    field_delete_field('shipping_method');
   */
 }
 
 /**
  * Install the shipping rate cache table for Shipping 2.x if necessary.
- * This should actually never be run on 2.x but is here for reference.
  */
 function commerce_shipping_update_7004($sandbox) {
+  // This should actually never be run on 2.x but is here for reference.
   /*
-  if (!db_table_exists('cache_commerce_shipping_rates')) {
-    $table = drupal_get_schema_unprocessed('system', 'cache');
-    $table['description'] = 'Cache table for the temporary storage of base calculated shipping rates for orders.';
-    $table['fields']['cid']['description'] = 'Primary Key: Order ID and shipping method the rates are for.';
-    db_create_table('cache_commerce_shipping_rates', $table);
-    return t('Created shipping rate cache table for Shipping 2.x.');
-  }
-  return t('Skipped creating the shipping rate cache table; it already exists.');
+    if (!db_table_exists('cache_commerce_shipping_rates')) {
+      $table = drupal_get_schema_unprocessed('system', 'cache');
+      $table['description'] = 'Cache table for the temporary storage of base calculated shipping rates for orders.';
+      $table['fields']['cid']['description'] = 'Primary Key: Order ID and shipping method the rates are for.';
+      db_create_table('cache_commerce_shipping_rates', $table);
+      return t('Created shipping rate cache table for Shipping 2.x.');
+    }
+    return t('Skipped creating the shipping rate cache table; it already exists.');
   */
 }
 
 /**
+ * Upgrade from Commerce Shipping 1.x.
+ *
  * Upgrade from Commerce Shipping 1.x by renaming the commerce_shipping_method
  * field on the shipping line item type to commerce_shipping_service and
  * converting price components on shipping line items to the generic Shipping

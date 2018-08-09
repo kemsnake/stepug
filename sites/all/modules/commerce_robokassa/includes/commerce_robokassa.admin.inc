@@ -43,7 +43,7 @@ function commerce_robokassa_settings_form($settings = NULL) {
       'test' => ('Test - use for testing.'),
       'live' => ('Live - use for processing real transactions'),
     ),
-    '#default_value' => $settings['server'],
+    '#default_value' => isset($settings['server']) ? $settings['server'] : 'test',
   );
 
   $form['status'] = array(

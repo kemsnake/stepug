@@ -219,6 +219,8 @@ function hook_commerce_checkout_page_info_alter(&$checkout_pages) {
  *   if not specified, defaults to the title
  * - page: the page_id of the checkout page the pane should appear on by
  *   default; defaults to ‘checkout’
+ * - fieldset:  boolean that defines if the pane should render as a fieldset
+ *   or container element.
  * - locked: boolean indicating that the pane cannot be moved from the
  *   specified checkout page.
  * - collapsible: boolean indicating whether or not the checkout pane’s fieldset
@@ -291,4 +293,22 @@ function hook_commerce_checkout_pane_info() {
  */
 function hook_commerce_checkout_pane_info_alter(&$checkout_panes) {
   $checkout_panes['billing']['weight'] = -6;
+}
+
+/**
+ * Allows modules to define the first page for a new order entering checkout.
+ *
+ * The default first checkout page is whatever the first page is after the
+ * checkout pages array is sorted by weight. This hook allows modules to provide
+ * an alternate page ID or default page ID without having to build the checkout
+ * page and pane info arrays, providing a noticeable performance improvement.
+ *
+ * If more than one module implements this hook, the first returned value will
+ * be used.
+ *
+ * @return string
+ *   The new first checkout page ID.
+ */
+function hook_commerce_checkout_first_checkout_page() {
+  return 'checkout';
 }

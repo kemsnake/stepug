@@ -5,9 +5,8 @@
  * Defines Views integration for Commerce Shipping.
  */
 
-
 /**
- * Implements hook_views_data_alter()
+ * Implements hook_views_data_alter().
  */
 function commerce_shipping_views_data_alter(&$data) {
   // Add a relationship to the order table to join to a representative shipping

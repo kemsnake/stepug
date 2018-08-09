@@ -65,7 +65,7 @@ function commerce_robokassa_commerce_payment_method_info() {
 function commerce_robokassa_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
   $build = array();
   $text = theme('image', array(
-    'path' => drupal_get_path('module', 'commerce_robokassa') . '/big_logo.png',
+    'path' => drupal_get_path('module', 'commerce_robokassa') . '/logo.gif',
     'alt' => t('Robokassa'),
     'title' => t('Robokassa'),
     'attributes' => array('class' => 'logo-robokassa'),
@@ -106,10 +106,7 @@ function commerce_robokassa_build_redirect_form($form, &$form_state, $order, $se
   $form["MrchLogin"] = array('#type' => 'hidden', '#value' => commerce_robokassa_get_settings('login'));
   $form["OutSum"] = array('#type' => 'hidden', '#value' => $amount);
   $form["InvId"] = array('#type' => 'hidden', '#value' => $order->order_id);
-  global $user;
-  if (isset($user->mail)) {
-    $form["sEmail"] = array('#type' => 'hidden', '#value' => $user->mail);
-  }
+
   // Calculate signature.
   $form["SignatureValue"] = array(
     '#type' => 'hidden',
@@ -231,52 +228,20 @@ function commerce_robokassa_result() {
       $currency_code = $wrapper->commerce_order_total->currency_code->value();
       $amount = $wrapper->commerce_order_total->amount->value();
       // Get real price.
-      $amount_real = commerce_currency_amount_to_decimal($amount, $currency_code);
+      $amount = commerce_currency_amount_to_decimal($amount, $currency_code);
 
-      // @todo do we really need this?
       $amount_received = abs($amount_in);
-      $amount_stored = abs($amount_real);
+      $amount_stored = abs($amount);
 
       if ($amount_received == $amount_stored) {
-        $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
-        $charge = array(
-          'amount' => $amount,
-          'currency_code' => $currency_code,
-        );
-
-        commerce_robokassa_create_transaction($payment_method, $order, $charge);
+        commerce_robokassa_create_transaction($order_in, commerce_robokassa_get_settings('status'));
         watchdog('commerce_robokassa', 'Order #@order paid successfully.', array('@order' => $order_in), WATCHDOG_INFO);
-        // Send email to admin
-        //$output = views_embed_view('order_for_email', 'block', $order->order_id);
-        $output = views_embed_view('order_for_email', 'block', 212);
-        $my_module = 'custom_stepug';
-        $from = variable_get('system_mail', 'info@stepug.ru');
-        $message = array(
-          'id' => $my_module,
-          'from' => $from,
-          'to' => 'kemsnake@yandex.ru, dotta@yandex.ru',
-          'subject' => 'Получена оплата по заказу номер ' . $order->order_id,
-          'body' => $output,
-          'headers' => array(
-            'From' => $from,
-            'Sender' => $from,
-            'Return-Path' => $from,
-          ),
-        );
-
-        $system = drupal_mail_system($my_module, 'order_success_paid');
-        if ($system->mail($message)) {
-          watchdog('mail', 'Successfully sent mail about order %order_id paid to admin', array('%order_id' => $order->order_id));
-        }
-        else {
-          watchdog('mail', 'Failed send mail about order %order_id paid to admin', array('%order_id' => $order->order_id), 'error');
-        }
       }
       else {
         watchdog('commerce_robokassa', 'Order #@order was not paid: recieved (@am_rec) and real(@am_int) order info do not match.', array(
           '@order' => $order_in,
           '@am_rec' => $amount_in,
-          '@am_int' => $amount_real,
+          '@am_int' => $amount,
           ), WATCHDOG_ERROR);
       }
     }
@@ -302,13 +267,20 @@ function commerce_robokassa_result() {
  * @param $name
  *   The name entered on the submission form.
  */
-function commerce_robokassa_create_transaction($payment_method, $order, $charge) {
+function commerce_robokassa_create_transaction($order_id, $status) {
+  $order = commerce_order_load($order_id);
+  $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+
   $transaction = commerce_payment_transaction_new('commerce_robokassa', $order->order_id);
   $transaction->instance_id = $payment_method['instance_id'];
 
-  // Store payment details in transaction.
-  $transaction->amount = $charge['amount'];
-  $transaction->currency_code = $charge['currency_code'];
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  $currency_code = $wrapper->commerce_order_total->currency_code->value();
+  $amount = $wrapper->commerce_order_total->amount->value();
+
+  //$transaction->amount = $order->commerce_order_total[LANGUAGE_NONE][0]['amount'];
+  //$transaction->currency_code = $order->commerce_order_total[LANGUAGE_NONE][0]['currency_code'];
 
   // @doto Sheck statuses deeper
   $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;

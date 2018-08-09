@@ -11,9 +11,9 @@ files[] = includes/recently_read.views.inc
 files[] = includes/recently_read_handler_filter_current.inc
 files[] = includes/recently_read_handler_filter_entity_type.inc
 
-; Information added by Drupal.org packaging script on 2014-08-27
-version = "7.x-3.1"
+; Information added by Drupal.org packaging script on 2016-09-05
+version = "7.x-3.2"
 core = "7.x"
 project = "recently_read"
-datestamp = "1409150634"
+datestamp = "1473054540"
 

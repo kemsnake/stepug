@@ -97,6 +97,11 @@ function custom_stepug_robokassa_fail() {
   drupal_goto('');
 }
 
+function custom_stepug_init() {
+  //dpm('enter3');
+  //drupal_add_library('system', 'ui.spinner');
+}
+
 function custom_stepug_form_alter(&$form, &$form_state, $form_id) {
   if (strstr($form_id, 'commerce_cart_add_to_cart_form') || $form_id == 'views_form_commerce_cart_form_default') {
     drupal_add_library('system', 'ui.spinner');

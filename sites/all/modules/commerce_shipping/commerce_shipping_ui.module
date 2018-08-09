@@ -212,7 +212,6 @@ function commerce_shipping_ui_help($path, $arg) {
   }
 }
 
-
 /**
  * Implements hook_menu_local_tasks_alter().
  */
